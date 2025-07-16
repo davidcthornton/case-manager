@@ -6,6 +6,8 @@ import Page2 from './Page2';
 import EditCase from './EditCase';
 import NewCase from './NewCase';
 import ManageCase from './ManageCase';
+import CollectEvidence from './CollectEvidence';
+
 
 
 import './App.css';
@@ -79,7 +81,9 @@ function App() {
       <Route path="/page2" element={<Page2 />} />
 	  <Route path="/editcase" element={<EditCase />} />
 	  <Route path="/newcase" element={<NewCase />} />
-	<Route path="/managecase" element={<ManageCase />} />  
+	<Route path="/managecase" element={<ManageCase />} /> 
+	<Route path="/collectevidence" element={<CollectEvidence />} />
+	
     </Routes>
   );
 }

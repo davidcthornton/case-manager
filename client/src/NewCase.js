@@ -16,14 +16,17 @@ function NewCase() {
       return;
     }
 
-    navigate('/managecase', {
-      state: {
-        caseNumber,
-        eventDate,
-        eventTime,
-        crimeType
-      }
-    });
+
+	const caseData = {
+		caseNumber,
+		eventDate,
+		eventTime,
+		crimeType
+	  };
+
+	  sessionStorage.setItem('caseData', JSON.stringify(caseData));
+
+    navigate('/managecase');
   };
 
   return (
