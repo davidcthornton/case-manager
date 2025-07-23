@@ -9,7 +9,7 @@ function NewCase() {
   const [eventDate, setEventDate] = useState('');
   const [eventTime, setEventTime] = useState('');
   const [crimeType, setCrimeType] = useState('');
-
+/*
   const handleSubmit = () => {
     if (!caseNumber || !eventDate || !eventTime || !crimeType) {
       alert("Please fill in all fields.");
@@ -28,6 +28,49 @@ function NewCase() {
 
     navigate('/managecase');
   };
+*/
+
+const handleSubmit = async () => {
+  if (!caseNumber || !eventDate || !eventTime || !crimeType) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const caseData = {
+    caseNumber,
+    eventDate,
+    eventTime,
+    crimeType
+  };
+
+  try {
+    const res = await fetch('http://localhost:4000/cases', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(caseData)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Unknown error');
+    }
+
+    const saved = await res.json();
+    console.log('Case saved:', saved);
+
+    // Optional: keep session storage if needed
+    sessionStorage.setItem('caseData', JSON.stringify(saved));
+
+    navigate('/managecase');
+  } catch (error) {
+    console.error('Failed to create case:', error);
+    alert(`Failed to create case: ${error.message}`);
+  }
+};
+
+
 
   return (
     <div className="Page">

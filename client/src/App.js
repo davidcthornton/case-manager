@@ -21,15 +21,40 @@ function Home() {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState('');
+  const [users, setUsers] = useState([]); 
+	const [cases, setCases] = useState([]);
 
+	useEffect(() => {
+	  fetch('http://localhost:4000/cases')
+		.then(res => res.json())
+		.then(data => setCases(data))
+		.catch(err => console.error('Error loading cases:', err));
+	}, []);
 
+/*
+	fetch('http://localhost:4000/users', {
+	  method: 'POST',
+	  headers: { 'Content-Type': 'application/json' },
+	  body: JSON.stringify({ name: 'userOne', email: 'user@example.com' })
+	});
+*/
 
+/*
+	// Example React hook to fetch users
+	useEffect(() => {
+	  fetch('http://localhost:4000/users')
+		.then(res => res.json())
+		.then(data => setUsers(data));
+	}, []);
+*/
+
+/*
   useEffect(() => {
     fetch('http://localhost:5000/')
       .then(response => response.text())
       .then(data => setMessage(data));
   }, []);
-
+*/
   return (
     <div className="Page">
 	  <h1>Case Manager 1.0</h1>
@@ -41,16 +66,19 @@ function Home() {
 		<div style={{ marginTop: '40px' }}>
 		  <label htmlFor="case-select">Select Case to Edit:</label>
 		  <select
-			id="case-select"
-			value={selectedItem}
-			onChange={(e) => setSelectedItem(e.target.value)}
-			style={{ marginLeft: '10px', padding: '5px' }}
-		  >
-			<option value="">-- Choose a case --</option>
-			<option value="case1">Case 001</option>
-			<option value="case2">Case 002</option>
-			<option value="case3">Case 003</option>
-		  </select>
+			  id="case-select"
+			  value={selectedItem}
+			  onChange={(e) => setSelectedItem(e.target.value)}
+			  style={{ marginLeft: '10px', padding: '5px' }}
+			>
+			  <option value="">-- Choose a case --</option>
+			  {cases.map((c) => (
+				<option key={c.id} value={c.id}>
+				  {c.caseNumber}
+				</option>
+			  ))}
+			</select>
+
 
 		  <br /><br />
 
@@ -62,6 +90,7 @@ function Home() {
 				return;
 			  }
 			  navigate('/editcase', { state: { caseId: selectedItem } });
+			  
 			}}
 		  >
 			Edit Case
