@@ -7,6 +7,8 @@ import EditCase from './EditCase';
 import NewCase from './NewCase';
 import ManageCase from './ManageCase';
 import CollectEvidence from './CollectEvidence';
+import RemovableMediaInstructions from './RemovableMediaInstructions';
+import SmartphoneInstructions from './smartphoneInstructions';
 
 
 
@@ -83,6 +85,8 @@ function App() {
 	  <Route path="/newcase" element={<NewCase />} />
 	<Route path="/managecase" element={<ManageCase />} /> 
 	<Route path="/collectevidence" element={<CollectEvidence />} />
+	<Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
+	<Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
 	
     </Routes>
   );

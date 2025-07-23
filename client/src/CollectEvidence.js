@@ -1,27 +1,41 @@
-// CollectEvidence.js
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function CollectEvidence() {
   const [selectedItem, setSelectedItem] = useState('');
   const [deviceName, setDeviceName] = useState('');
-  const [deviceType, setDeviceType] = useState('');  
+  const [deviceType, setDeviceType] = useState('');
+  const navigate = useNavigate();
 
-	useEffect(() => {
-		const handleMessage = (event) => {
-		  if (event.origin !== 'http://localhost:3001') return;
+  // 1. Map evidence types to routes
+  const instructionRoutes = {
+    Smartphone: '/smartphoneInstructions',
+    Laptop: '/laptopInstructions',
+    'Flash/Thumb Drive': '/removableMediaInstructions',
+    'External Drive': '/removableMediaInstructions',
+    Router: '/routerInstructions',
+    Desktop: '/desktopInstructions',
+  };
 
-		  const { deviceName, deviceType } = event.data || {};
+  // 2. Lookup path for selected item
+  const instructionPath = instructionRoutes[selectedItem];
 
-		  if (deviceName && deviceType) {
-			setDeviceName(deviceName);
-			setDeviceType(deviceType);
-			setSelectedItem(deviceType); // auto-select dropdown if matched
-		  }
-		};
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.origin !== 'http://localhost:3001') return;
 
-		window.addEventListener('message', handleMessage);
-		return () => window.removeEventListener('message', handleMessage);
-	  }, []);
+      const { deviceName, deviceType } = event.data || {};
+
+      if (deviceName && deviceType) {
+        setDeviceName(deviceName);
+        setDeviceType(deviceType);
+        setSelectedItem(deviceType); // auto-select dropdown if matched
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <div className="Page">
@@ -48,10 +62,24 @@ function CollectEvidence() {
       {selectedItem && (
         <div style={{ marginTop: '20px', fontStyle: 'italic' }}>
           Here are the instructions for collecting a <strong>{selectedItem}</strong>.
+          <br />
+          {instructionPath ? (
+            <button
+              className="gray-button"
+              onClick={() => navigate(instructionPath)}
+              style={{ marginTop: '10px' }}
+            >
+              Collection Instructions
+            </button>
+          ) : (
+            <p style={{ color: 'red', marginTop: '10px' }}>
+              No instructions available for this item.
+            </p>
+          )}
         </div>
       )}
-	  
-	  {deviceName && (
+
+      {deviceName && (
         <div style={{ marginTop: '10px', color: 'green' }}>
           Device identified: <strong>{deviceName}</strong> ({deviceType})
         </div>
