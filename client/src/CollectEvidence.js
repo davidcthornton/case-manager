@@ -1,35 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-function CollectEvidence() {
-  const [selectedItem, setSelectedItem] = useState('');
-  const [deviceName, setDeviceName] = useState('');
-  const [deviceType, setDeviceType] = useState('');
+const DEVICE_TYPES = [
+  'desktop',
+  'laptop',
+  'smartphone',
+  'tablet',
+  'externaldrive',
+  'removablemedia',
+  'router',
+  'other'
+];
+
+const INSTRUCTION_ROUTES = {
+  smartphone: '/smartphoneInstructions',
+  laptop: '/laptopInstructions',
+  removablemedia: '/removableMediaInstructions',
+  externaldrive: '/removableMediaInstructions',
+  router: '/routerInstructions',
+  desktop: '/desktopInstructions',
+  tablet: '/tabletInstructions',
+  other: '/otherInstructions',
+};
+
+const CollectEvidence = () => {
+  const { caseId } = useLocation().state || {};
   const navigate = useNavigate();
 
-  // 1. Map evidence types to routes
-  const instructionRoutes = {
-    Smartphone: '/smartphoneInstructions',
-    Laptop: '/laptopInstructions',
-    'Flash/Thumb Drive': '/removableMediaInstructions',
-    'External Drive': '/removableMediaInstructions',
-    Router: '/routerInstructions',
-    Desktop: '/desktopInstructions',
-  };
+  const [deviceName, setDeviceName] = useState('');
+  const [deviceType, setDeviceType] = useState('');
+  const [wasIdentified, setWasIdentified] = useState(false);
 
-  // 2. Lookup path for selected item
-  const instructionPath = instructionRoutes[selectedItem];
-
+  // Handle messages from identification tool
   useEffect(() => {
     const handleMessage = (event) => {
       if (event.origin !== 'http://localhost:3001') return;
-
       const { deviceName, deviceType } = event.data || {};
 
       if (deviceName && deviceType) {
         setDeviceName(deviceName);
         setDeviceType(deviceType);
-        setSelectedItem(deviceType); // auto-select dropdown if matched
+        setWasIdentified(true);
       }
     };
 
@@ -37,49 +48,87 @@ function CollectEvidence() {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
+  const handleSubmit = async () => {
+    if (!caseId) {
+      alert('No case selected.');
+      return;
+    }
+    if (!deviceName || !deviceType) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:4000/devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: deviceName,
+          type: deviceType,
+          collectedAt: new Date().toISOString(),
+          caseId
+        })
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to collect device.');
+      }
+
+      alert('Device collected successfully!');
+      navigate('/managecase', { state: { caseId } });
+
+    } catch (err) {
+      console.error(err);
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  if (!caseId) return <p>No case selected.</p>;
+
+  const instructionPath = INSTRUCTION_ROUTES[deviceType.toLowerCase()] || null;
+
   return (
     <div className="Page">
       <h1>Collect Evidence</h1>
+      <p>For Case ID: {caseId}</p>
 
       <div style={{ marginBottom: '20px' }}>
-        <label htmlFor="evidence-select">Select Evidence Type:</label><br />
+        <label>Device Name:</label><br />
+        <input
+          type="text"
+          value={deviceName}
+          onChange={(e) => setDeviceName(e.target.value)}
+          style={{ width: '300px', padding: '5px' }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>Device Type:</label><br />
         <select
-          id="evidence-select"
-          value={selectedItem}
-          onChange={(e) => setSelectedItem(e.target.value)}
-          style={{ padding: '5px', marginTop: '8px' }}
+          value={deviceType}
+          onChange={(e) => setDeviceType(e.target.value)}
+          style={{ padding: '5px' }}
         >
-          <option value="">-- Choose an item --</option>
-          <option value="Smartphone">Smartphone</option>
-          <option value="Laptop">Laptop</option>
-          <option value="Flash/Thumb Drive">Flash/Thumb Drive</option>
-          <option value="External Drive">External Drive</option>
-          <option value="Router">Router</option>
-          <option value="Desktop">Desktop</option>
+          <option value="">-- Select Type --</option>
+          {DEVICE_TYPES.map((type) => (
+            <option key={type} value={type}>{type}</option>
+          ))}
         </select>
       </div>
 
-      {selectedItem && (
-        <div style={{ marginTop: '20px', fontStyle: 'italic' }}>
-          Here are the instructions for collecting a <strong>{selectedItem}</strong>.
-          <br />
-          {instructionPath ? (
-            <button
-              className="gray-button"
-              onClick={() => navigate(instructionPath)}
-              style={{ marginTop: '10px' }}
-            >
-              Collection Instructions
-            </button>
-          ) : (
-            <p style={{ color: 'red', marginTop: '10px' }}>
-              No instructions available for this item.
-            </p>
-          )}
+      {instructionPath && (
+        <div style={{ marginTop: '10px' }}>
+          <button
+            className="gray-button"
+            onClick={() => navigate(instructionPath)}
+          >
+            📄 Collection Instructions
+          </button>
         </div>
       )}
 
-      {deviceName && (
+      {wasIdentified && (
         <div style={{ marginTop: '10px', color: 'green' }}>
           Device identified: <strong>{deviceName}</strong> ({deviceType})
         </div>
@@ -90,10 +139,16 @@ function CollectEvidence() {
         onClick={() => window.open('http://localhost:3001/', '_blank')}
         style={{ marginTop: '30px' }}
       >
-        Help me Identify
+        🧠 Help Me Identify
+      </button>
+
+      <br /><br />
+
+      <button className="gray-button" onClick={handleSubmit}>
+        ✅ Collect
       </button>
     </div>
   );
-}
+};
 
 export default CollectEvidence;

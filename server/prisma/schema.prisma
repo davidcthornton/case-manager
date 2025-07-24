@@ -21,6 +21,17 @@ model User {
   email String  @unique
 }
 
+model Device {
+  id           Int       @id @default(autoincrement())
+  name         String
+  type         DeviceType
+  collectedAt  DateTime
+  case         Case      @relation(fields: [caseId], references: [id])
+  caseId       Int
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
 
 model Case {
   id         Int      @id @default(autoincrement())
@@ -28,6 +39,7 @@ model Case {
   eventDate  DateTime
   eventTime  String   // storing time as a string (e.g. '14:30')
   crimeType  CrimeType
+  devices      Device[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -39,3 +51,16 @@ enum CrimeType {
   fraud
   arson
 }
+
+enum DeviceType {
+	desktop
+	laptop
+	smartphone
+	tablet
+	externaldrive
+	removablemedia
+	router
+	other
+}
+
+

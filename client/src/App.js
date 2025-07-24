@@ -9,7 +9,7 @@ import ManageCase from './ManageCase';
 import CollectEvidence from './CollectEvidence';
 import RemovableMediaInstructions from './RemovableMediaInstructions';
 import SmartphoneInstructions from './smartphoneInstructions';
-
+import Navbar from './Navbar';
 
 
 import './App.css';
@@ -82,19 +82,19 @@ function Home() {
 
 		  <br /><br />
 
-		  <button
-			className="gray-button"
-			onClick={() => {
-			  if (!selectedItem) {
-				alert("Please select a case to edit.");
-				return;
-			  }
-			  navigate('/editcase', { state: { caseId: selectedItem } });
-			  
-			}}
-		  >
-			Edit Case
-		  </button>
+		<button
+			  className="gray-button"
+			  onClick={() => {
+				if (!selectedItem) {
+				  alert("Please select a case to manage.");
+				  return;
+				}
+				navigate('/managecase', { state: { caseId: selectedItem } });
+			  }}
+			>
+			  Manage Case
+			</button>
+
 		</div>
 
 		
@@ -104,20 +104,25 @@ function Home() {
   );
 }
 
+
+
+
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/page1" element={<Page1 />} />
-      <Route path="/page2" element={<Page2 />} />
-	  <Route path="/editcase" element={<EditCase />} />
-	  <Route path="/newcase" element={<NewCase />} />
-	<Route path="/managecase" element={<ManageCase />} /> 
-	<Route path="/collectevidence" element={<CollectEvidence />} />
-	<Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
-	<Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
-	
-    </Routes>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/page1" element={<Page1 />} />
+        <Route path="/page2" element={<Page2 />} />
+        <Route path="/editcase" element={<EditCase />} />
+        <Route path="/newcase" element={<NewCase />} />
+        <Route path="/managecase" element={<ManageCase />} /> 
+        <Route path="/collectevidence" element={<CollectEvidence />} />
+        <Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
+        <Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
+      </Routes>
+    </>
   );
 }
 

@@ -1,46 +1,61 @@
-
+// ManageCase.js
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
+const ManageCase = () => {
+  const navigate = useNavigate();
+  const { caseId } = useLocation().state || {};
 
-function ManageCase() {
-	const location = useLocation();
-  const navigate = useNavigate();	
-  const [caseData, setCaseData] = useState(null);
+  const [devices, setDevices] = useState([]);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('caseData');
-	console.log(stored)
-    if (stored) {
-      setCaseData(JSON.parse(stored));
+    if (caseId) {
+      fetch(`http://localhost:4000/cases/${caseId}/devices`)
+        .then(res => res.json())
+        .then(data => setDevices(data))
+        .catch(err => console.error('Failed to fetch devices:', err));
     }
-  }, []);
+  }, [caseId]);
+
+  if (!caseId) return <p>No case selected.</p>;
 
   return (
     <div className="Page">
       <h1>Manage Case</h1>
-      {caseData ? (
-        <>
-          <p><strong>Case Number:</strong> {caseData.caseNumber}</p>
-          <p><strong>Date:</strong> {caseData.eventDate}</p>
-          <p><strong>Time:</strong> {caseData.eventTime}</p>
-          <p><strong>Crime Type:</strong> {caseData.crimeType}</p>
-        </>
-      ) : (
-        <p>No case data found in session.</p>
-      )}
-	  
-	  <br />
+      <p>Case ID: {caseId}</p>
+
       <button
         className="gray-button"
-        onClick={() => navigate('/collectevidence')}
+        onClick={() => navigate('/editcase', { state: { caseId } })}
       >
-        Collect Evidence
+        ✏️ Edit Details
       </button>
+
+      <br /><br />
+
+      <button
+        className="gray-button"
+        onClick={() => navigate('/collectevidence', { state: { caseId } })}
+      >
+        📦 Collect Evidence
+      </button>
+
+      <hr style={{ margin: '30px 0' }} />
+
+      <h2>Collected Devices</h2>
+      {devices.length === 0 ? (
+        <p>No devices collected for this case.</p>
+      ) : (
+        <ul>
+          {devices.map((d) => (
+            <li key={d.id}>
+              {d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-}
+};
 
 export default ManageCase;
-
-

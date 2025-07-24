@@ -2,49 +2,60 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const cases = [
-    {
+  // 🧹 Delete existing data in correct order
+  await prisma.device.deleteMany();
+  await prisma.case.deleteMany();
+
+  // 📦 Create test cases
+  const case1 = await prisma.case.create({
+    data: {
       caseNumber: 'CASE1001',
       eventDate: new Date('2023-08-10'),
       eventTime: '14:45',
       crimeType: 'theft',
     },
-    {
+  });
+
+  const case2 = await prisma.case.create({
+    data: {
       caseNumber: 'CASE1002',
       eventDate: new Date('2023-07-22'),
       eventTime: '09:30',
-      crimeType: 'assault',
-    },
-    {
-      caseNumber: 'CASE1003',
-      eventDate: new Date('2023-06-18'),
-      eventTime: '22:15',
-      crimeType: 'arson',
-    },
-    {
-      caseNumber: 'CASE1004',
-      eventDate: new Date('2023-09-03'),
-      eventTime: '18:00',
       crimeType: 'fraud',
     },
+  });
+
+  // 💾 Add related devices
+ await prisma.device.createMany({
+  data: [
     {
-      caseNumber: 'CASE1005',
-      eventDate: new Date('2023-05-12'),
-      eventTime: '01:20',
-      crimeType: 'theft',
+      name: 'iPhone 12',
+      type: 'smartphone', // ✅ matches enum
+      collectedAt: new Date('2023-08-11T10:00:00Z'),
+      caseId: case1.id,
     },
-  ];
+    {
+      name: 'Samsung USB Drive',
+      type: 'removablemedia',
+      collectedAt: new Date('2023-08-11T10:15:00Z'),
+      caseId: case1.id,
+    },
+    {
+      name: 'MacBook Pro',
+      type: 'laptop',
+      collectedAt: new Date('2023-07-23T13:00:00Z'),
+      caseId: case2.id,
+    },
+  ],
+});
 
-  for (const caseData of cases) {
-    await prisma.case.create({ data: caseData });
-  }
 
-  console.log('Seed data inserted.');
+  console.log('✅ Seed data inserted.');
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('❌ Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {

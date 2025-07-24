@@ -75,4 +75,60 @@ app.post('/cases', async (req, res) => {
 });
 
 
+app.put('/cases/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { caseNumber, eventDate, eventTime, crimeType } = req.body;
+
+  try {
+    const updated = await prisma.case.update({
+      where: { id },
+      data: {
+        caseNumber,
+        eventDate: new Date(eventDate),
+        eventTime,
+        crimeType,
+      },
+    });
+
+    res.json(updated);
+  } catch (err) {
+    console.error('Error updating case:', err);
+    res.status(500).json({ error: 'Failed to update case' });
+  }
+});
+
+
+app.post('/devices', async (req, res) => {
+  const { name, type, collectedAt, caseId } = req.body;
+
+  try {
+    const device = await prisma.device.create({
+      data: {
+        name,
+        type,
+        collectedAt: new Date(collectedAt),
+        case: { connect: { id: parseInt(caseId) } }
+      }
+    });
+
+    res.status(201).json(device);
+  } catch (err) {
+    console.error('Error creating device:', err);
+    res.status(500).json({ error: 'Failed to create device' });
+  }
+});
+
+
+app.get('/cases/:id/devices', async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const devices = await prisma.device.findMany({ where: { caseId: id } });
+    res.json(devices);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch devices' });
+  }
+});
+
+
 app.listen(4000, () => console.log('API running on http://localhost:4000'));
