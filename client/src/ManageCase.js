@@ -31,6 +31,35 @@ const ManageCase = () => {
         ✏️ Edit Details
       </button>
 
+	<br /><br />
+
+	<button
+	  className="gray-button"
+	  onClick={async () => {
+		try {
+		  const res = await fetch(`http://localhost:4000/cases/${caseId}/export`);
+		  if (!res.ok) throw new Error('Failed to download ZIP');
+
+		  const blob = await res.blob();
+		  const url = window.URL.createObjectURL(blob);
+		  const link = document.createElement('a');
+		  link.href = url;
+		  link.download = `case_${caseId}_evidence.zip`;
+		  document.body.appendChild(link);
+		  link.click();
+		  link.remove();
+		  window.URL.revokeObjectURL(url);
+		} catch (err) {
+		  alert(err.message);
+		}
+	  }}
+	>
+	  ⬇️ Download Evidence ZIP
+	</button>
+
+
+
+
       <br /><br />
 
       <button
@@ -47,11 +76,17 @@ const ManageCase = () => {
         <p>No devices collected for this case.</p>
       ) : (
         <ul>
-          {devices.map((d) => (
-            <li key={d.id}>
-              {d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
-            </li>
-          ))}
+          
+		  {devices.map((d) => (
+			  <li key={d.id}>
+				{d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
+				{d.imagePath && (
+				  <div><img src={`http://localhost:4000/${d.imagePath}`} alt="evidence" style={{ maxWidth: '200px' }} /></div>
+				)}
+			  </li>
+			))}
+
+		  
         </ul>
       )}
     </div>

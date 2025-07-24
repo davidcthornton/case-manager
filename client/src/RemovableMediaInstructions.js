@@ -80,7 +80,8 @@ const SwipeableCards = () => {
   });
 
   const handleDone = () => {
-    navigate('/collectevidence'); // Replace with your actual route
+    /*navigate('/collectevidence'); */
+	navigate(-1);
   };
 
   return (

@@ -27,6 +27,8 @@ const CollectEvidence = () => {
   const { caseId } = useLocation().state || {};
   const navigate = useNavigate();
 
+	const [imageFile, setImageFile] = useState(null);
+
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
   const [wasIdentified, setWasIdentified] = useState(false);
@@ -48,41 +50,34 @@ const CollectEvidence = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  const handleSubmit = async () => {
-    if (!caseId) {
-      alert('No case selected.');
-      return;
-    }
-    if (!deviceName || !deviceType) {
-      alert('Please fill in all fields.');
-      return;
-    }
+ const handleSubmit = async () => {
+  if (!caseId || !deviceName || !deviceType) {
+    alert('Please fill in all fields.');
+    return;
+  }
 
-    try {
-      const res = await fetch('http://localhost:4000/devices', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: deviceName,
-          type: deviceType,
-          collectedAt: new Date().toISOString(),
-          caseId
-        })
-      });
+  const formData = new FormData();
+  formData.append('name', deviceName);
+  formData.append('type', deviceType);
+  formData.append('collectedAt', new Date().toISOString());
+  formData.append('caseId', caseId);
+  if (imageFile) formData.append('image', imageFile);
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to collect device.');
-      }
+  try {
+    const res = await fetch('http://localhost:4000/devices', {
+      method: 'POST',
+      body: formData,
+    });
 
-      alert('Device collected successfully!');
-      navigate('/managecase', { state: { caseId } });
+    if (!res.ok) throw new Error('Failed to collect device');
+    alert('Device collected successfully!');
+    navigate('/managecase', { state: { caseId } });
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
 
-    } catch (err) {
-      console.error(err);
-      alert(`Error: ${err.message}`);
-    }
-  };
 
   if (!caseId) return <p>No case selected.</p>;
 
@@ -102,6 +97,16 @@ const CollectEvidence = () => {
           style={{ width: '300px', padding: '5px' }}
         />
       </div>
+	  
+	  <div style={{ marginBottom: '20px' }}>
+		  <label>Upload Image:</label><br />
+		  <input
+			type="file"
+			accept="image/*"
+			onChange={(e) => setImageFile(e.target.files[0])}
+		  />
+		</div>
+
 
       <div style={{ marginBottom: '20px' }}>
         <label>Device Type:</label><br />
