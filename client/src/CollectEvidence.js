@@ -32,21 +32,21 @@ const CollectEvidence = () => {
   const [wasIdentified, setWasIdentified] = useState(false);
 
   let serverURL;
-  if (!process.env.SERVER_URL) {
+  if (!process.env.REACT_APP_SERVER_URL) {
     serverURL = 'http://localhost:4000';
   } else {
-    serverURL = process.env.SERVER_URL;
+    serverURL = process.env.REACT_APP_SERVER_URL;
   }
-  console.log("API base URL:", process.env.SERVER_URL);
+  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
   console.log("serverURL is " + serverURL);
 
   let deviceIdFrontEndURL;
-  if (!process.env.DEVICE_ID_FRONTEND) {
+  if (!process.env.REACT_APP_DEVICE_ID_FRONTEND) {
     deviceIdFrontEndURL = 'http://localhost:3001';
   } else {
-    deviceIdFrontEndURL = process.env.DEVICE_ID_FRONTEND;
+    deviceIdFrontEndURL = process.env.REACT_APP_DEVICE_ID_FRONTEND;
   }
-  console.log("device id front end URL:", process.env.DEVICE_ID_FRONTEND);
+  console.log("device id front end URL:", process.env.REACT_APP_DEVICE_ID_FRONTEND);
   console.log("serverURL is " + deviceIdFrontEndURL);
 
 

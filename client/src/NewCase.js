@@ -10,12 +10,12 @@ function NewCase() {
   const [crimeType, setCrimeType] = useState('');
 
   let serverURL;
-  if (!process.env.SERVER_URL) {
+  if (!process.env.REACT_APP_SERVER_URL) {
     serverURL = 'http://localhost:4000';
   } else {
-    serverURL = process.env.SERVER_URL;
+    serverURL = process.env.REACT_APP_SERVER_URL;
   }
-  console.log("API base URL:", process.env.SERVER_URL);
+  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
   console.log("serverURL is " + serverURL);
 
   const handleSubmit = async () => {
