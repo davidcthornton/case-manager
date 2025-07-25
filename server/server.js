@@ -124,6 +124,9 @@ app.post('/cases', async (req, res) => {
     if (err.code === 'P2002') {
       res.status(400).json({ error: 'Case number already exists' });
     } else {
+      console.log('BODY:', req.body);
+      console.log('FILES:', req.files);
+
       res.status(500).json({ error: 'Failed to create case' });
     }
   }
@@ -152,7 +155,7 @@ app.put('/cases/:id', async (req, res) => {
   }
 });
 
-
+/*
 app.post('/devices', async (req, res) => {
   const { name, type, collectedAt, caseId } = req.body;
 
@@ -172,7 +175,7 @@ app.post('/devices', async (req, res) => {
     res.status(500).json({ error: 'Failed to create device' });
   }
 });
-
+*/
 
 app.get('/cases/:id/devices', async (req, res) => {
   const id = parseInt(req.params.id);
