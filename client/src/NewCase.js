@@ -4,71 +4,59 @@ import { useNavigate } from 'react-router-dom';
 
 function NewCase() {
   const navigate = useNavigate();
-
   const [caseNumber, setCaseNumber] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventTime, setEventTime] = useState('');
   const [crimeType, setCrimeType] = useState('');
-/*
-  const handleSubmit = () => {
+
+  let serverURL;
+  if (!process.env.SERVER_URL) {
+    serverURL = 'http://localhost:4000';
+  } else {
+    serverURL = process.env.SERVER_URL;
+  }
+  console.log("API base URL:", process.env.SERVER_URL);
+  console.log("serverURL is " + serverURL);
+
+  const handleSubmit = async () => {
     if (!caseNumber || !eventDate || !eventTime || !crimeType) {
       alert("Please fill in all fields.");
       return;
     }
 
+    const caseData = {
+      caseNumber,
+      eventDate,
+      eventTime,
+      crimeType
+    };
 
-	const caseData = {
-		caseNumber,
-		eventDate,
-		eventTime,
-		crimeType
-	  };
+    try {
+      const res = await fetch(serverURL + '/cases', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(caseData)
+      });
 
-	  sessionStorage.setItem('caseData', JSON.stringify(caseData));
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Unknown error');
+      }
 
-    navigate('/managecase');
-  };
-*/
+      const saved = await res.json();
+      console.log('Case saved:', saved);
 
-const handleSubmit = async () => {
-  if (!caseNumber || !eventDate || !eventTime || !crimeType) {
-    alert("Please fill in all fields.");
-    return;
-  }
+      // Optional: keep session storage if needed
+      sessionStorage.setItem('caseData', JSON.stringify(saved));
 
-  const caseData = {
-    caseNumber,
-    eventDate,
-    eventTime,
-    crimeType
-  };
-
-  try {
-    const res = await fetch('http://localhost:4000/cases', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(caseData)
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || 'Unknown error');
+      navigate('/managecase');
+    } catch (error) {
+      console.error('Failed to create case:', error);
+      alert(`Failed to create case: ${error.message}`);
     }
-
-    const saved = await res.json();
-    console.log('Case saved:', saved);
-
-    // Optional: keep session storage if needed
-    sessionStorage.setItem('caseData', JSON.stringify(saved));
-
-    navigate('/managecase');
-  } catch (error) {
-    console.error('Failed to create case:', error);
-    alert(`Failed to create case: ${error.message}`);
-  }
-};
+  };
 
 
 

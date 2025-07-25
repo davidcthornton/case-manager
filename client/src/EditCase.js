@@ -4,12 +4,20 @@ import { useLocation } from 'react-router-dom';
 function EditCase() {
   const location = useLocation();
   const { caseId } = location.state || {};
-
   const [caseData, setCaseData] = useState(null);
+
+	let serverURL;
+	if (!process.env.SERVER_URL) {
+		serverURL = 'http://localhost:4000';
+	} else {
+		serverURL = process.env.SERVER_URL;
+	}
+	console.log("API base URL:", process.env.SERVER_URL);
+	console.log("serverURL is " + serverURL);  
 
   useEffect(() => {
     if (caseId) {
-      fetch(`http://localhost:4000/cases/${caseId}`)
+      fetch(serverURL + '/cases/${caseId}')
         .then(res => res.json())
         .then(data => setCaseData(data))
         .catch(err => console.error('Failed to load case:', err));
@@ -80,7 +88,7 @@ function EditCase() {
   className="gray-button"
   onClick={async () => {
     try {
-      const res = await fetch(`http://localhost:4000/cases/${caseId}`, {
+      const res = await fetch(serverURL + '/cases/${caseId}', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

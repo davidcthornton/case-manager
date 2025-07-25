@@ -2,6 +2,9 @@ import React from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 
+import airplaneModeImage from './assets/airplaneMode.png'; 
+import smartphoneInBagWithChargerImage from './assets/smartphoneInBagWithCharger.png'; 
+
 const cardStyle = {
   height: '100vh',
   display: 'flex',
@@ -73,6 +76,11 @@ const cards = [
         <p>If possible, connect device to a charger to keep it powered</p>
         <p>Keep it unlocked</p>
         <p>Place it in airplane mode until it is in the hands of an experienced technician.</p>
+        <img
+          src={airplaneModeImage}
+          alt="Description of image"
+          style={{ width: '100%', height: 'auto' }}
+        />
       </div>
     )
   },
@@ -81,6 +89,11 @@ const cards = [
     text: (
       <div>
         <p>If available, Faraday evidence bags or else static-free evidence bags are best for the storage of mobile devices.</p>
+        <img
+          src={smartphoneInBagWithChargerImage}
+          alt="Description of image"
+          style={{ width: '100%', height: 'auto' }}
+        />
         <p>Work with crime scene service technicians or trained forensic personnel to preserve forensic evidence (fingerprints, biological samples, DNA, etc.) without disturbing the integrity of the device.</p>
       </div>
     )

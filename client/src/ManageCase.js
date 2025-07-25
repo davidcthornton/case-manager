@@ -5,12 +5,20 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const ManageCase = () => {
   const navigate = useNavigate();
   const { caseId } = useLocation().state || {};
-
   const [devices, setDevices] = useState([]);
+
+	let serverURL;
+	if (!process.env.SERVER_URL) {
+		serverURL = 'http://localhost:4000';
+	} else {
+		serverURL = process.env.SERVER_URL;
+	}
+	console.log("API base URL:", process.env.SERVER_URL);
+	console.log("serverURL is " + serverURL);  
 
   useEffect(() => {
     if (caseId) {
-      fetch(`http://localhost:4000/cases/${caseId}/devices`)
+      fetch(serverURL + '/cases/${caseId}/devices')
         .then(res => res.json())
         .then(data => setDevices(data))
         .catch(err => console.error('Failed to fetch devices:', err));
@@ -37,7 +45,7 @@ const ManageCase = () => {
 	  className="gray-button"
 	  onClick={async () => {
 		try {
-		  const res = await fetch(`http://localhost:4000/cases/${caseId}/export`);
+		  const res = await fetch(serverURL + '/cases/${caseId}/export');
 		  if (!res.ok) throw new Error('Failed to download ZIP');
 
 		  const blob = await res.blob();
@@ -81,7 +89,7 @@ const ManageCase = () => {
 			  <li key={d.id}>
 				{d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
 				{d.imagePath && (
-				  <div><img src={`http://localhost:4000/${d.imagePath}`} alt="evidence" style={{ maxWidth: '200px' }} /></div>
+				  <div><img src={serverURL + '/${d.imagePath}'} alt="evidence" style={{ maxWidth: '200px' }} /></div>
 				)}
 			  </li>
 			))}

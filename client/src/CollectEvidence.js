@@ -27,16 +27,35 @@ const CollectEvidence = () => {
   const { caseId } = useLocation().state || {};
   const navigate = useNavigate();
 
-	const [imageFile, setImageFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
 
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
   const [wasIdentified, setWasIdentified] = useState(false);
 
+	let serverURL;
+	if (!process.env.SERVER_URL) {
+		serverURL = 'http://localhost:4000';
+	} else {
+		serverURL = process.env.SERVER_URL;
+	}
+	console.log("API base URL:", process.env.SERVER_URL);
+	console.log("serverURL is " + serverURL);
+
+  let deviceIdFrontEndURL;
+  if (!process.env.DEVICE_ID_FRONTEND) {
+    deviceIdFrontEndURL = 'http://localhost:3001';
+  } else {
+    deviceIdFrontEndURL = process.env.DEVICE_ID_FRONTEND;
+  }
+  console.log("device id front end URL:", process.env.DEVICE_ID_FRONTEND);
+  console.log("serverURL is " + deviceIdFrontEndURL);
+
+
   // Handle messages from identification tool
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.origin !== 'http://localhost:3001') return;
+      if (event.origin !== deviceIdFrontEndURL) return;
       const { deviceName, deviceType } = event.data || {};
 
       if (deviceName && deviceType) {
@@ -50,33 +69,33 @@ const CollectEvidence = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
- const handleSubmit = async () => {
-  if (!caseId || !deviceName || !deviceType) {
-    alert('Please fill in all fields.');
-    return;
-  }
+  const handleSubmit = async () => {
+    if (!caseId || !deviceName || !deviceType) {
+      alert('Please fill in all fields.');
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append('name', deviceName);
-  formData.append('type', deviceType);
-  formData.append('collectedAt', new Date().toISOString());
-  formData.append('caseId', caseId);
-  if (imageFile) formData.append('image', imageFile);
+    const formData = new FormData();
+    formData.append('name', deviceName);
+    formData.append('type', deviceType);
+    formData.append('collectedAt', new Date().toISOString());
+    formData.append('caseId', caseId);
+    if (imageFile) formData.append('image', imageFile);
 
-  try {
-    const res = await fetch('http://localhost:4000/devices', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const res = await fetch(serverURL + '/devices', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (!res.ok) throw new Error('Failed to collect device');
-    alert('Device collected successfully!');
-    navigate('/managecase', { state: { caseId } });
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-};
+      if (!res.ok) throw new Error('Failed to collect device');
+      alert('Device collected successfully!');
+      navigate('/managecase', { state: { caseId } });
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
 
 
   if (!caseId) return <p>No case selected.</p>;
@@ -97,15 +116,15 @@ const CollectEvidence = () => {
           style={{ width: '300px', padding: '5px' }}
         />
       </div>
-	  
-	  <div style={{ marginBottom: '20px' }}>
-		  <label>Upload Image:</label><br />
-		  <input
-			type="file"
-			accept="image/*"
-			onChange={(e) => setImageFile(e.target.files[0])}
-		  />
-		</div>
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>Upload Image:</label><br />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImageFile(e.target.files[0])}
+        />
+      </div>
 
 
       <div style={{ marginBottom: '20px' }}>
