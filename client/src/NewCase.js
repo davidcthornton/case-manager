@@ -32,7 +32,7 @@ function NewCase() {
     };
 
     try {
-      const res = await fetch(serverURL + '/cases', {
+      const res = await fetch(serverURL + `/cases`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -51,7 +51,9 @@ function NewCase() {
       // Optional: keep session storage if needed
       sessionStorage.setItem('caseData', JSON.stringify(saved));
 
-      navigate('/managecase');
+      //navigate('/managecase');
+      navigate('/managecase', { state: { caseId: saved.id } });
+
     } catch (error) {
       console.error('Failed to create case:', error);
       alert(`Failed to create case: ${error.message}`);

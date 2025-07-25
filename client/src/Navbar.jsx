@@ -9,8 +9,8 @@ const Navbar = () => {
     <nav style={styles.navbar}>
       <Link to="/" style={linkStyle(location.pathname === '/')}>🏠 Home</Link>
       <Link to="/newcase" style={linkStyle(location.pathname === '/newcase')}>➕ New Case</Link>
-      <Link to="/managecase" style={linkStyle(location.pathname === '/managecase')}>📂 Manage</Link>
-      <Link to="/editcase" style={linkStyle(location.pathname === '/editcase')}>✏️ Edit</Link>
+      
+      
     </nav>
   );
 };

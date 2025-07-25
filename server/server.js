@@ -15,37 +15,50 @@ const path = require('path');
 const storage = multer.diskStorage({
   destination: 'uploads/',
   filename: (req, file, cb) => {
-    const unique = Date.now() + '-' + file.originalname;
+    const ext = path.extname(file.originalname); // get original extension
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e9) + ext;
     cb(null, unique);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage }); // ← use the configured storage
+
+
+
 
 app.use(cors());
 app.use(express.json());
 
 // POST /devices with image
-app.post('/devices', upload.single('image'), async (req, res) => {
-  const { name, type, collectedAt, caseId } = req.body;
+//const upload = multer({ dest: 'uploads/' });
 
+app.post('/devices', upload.array('images'), async (req, res) => {
   try {
+    const { name, type, collectedAt, caseId } = req.body;
+    const imagePaths = req.files.map(file => file.path); // relative paths
+
     const device = await prisma.device.create({
       data: {
         name,
         type,
         collectedAt: new Date(collectedAt),
         caseId: parseInt(caseId),
-        imagePath: req.file?.path || null,
+        images: {
+          create: imagePaths.map(path => ({ path }))
+        }
       },
+      include: {
+        images: true
+      }
     });
 
     res.status(201).json(device);
   } catch (err) {
-    console.error(err);
+    console.error('Error creating device with images:', err);
     res.status(500).json({ error: 'Failed to create device' });
   }
 });
+
 
 // serve static uploaded images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -164,7 +177,10 @@ app.post('/devices', async (req, res) => {
 app.get('/cases/:id/devices', async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    const devices = await prisma.device.findMany({ where: { caseId: id } });
+    const devices = await prisma.device.findMany({
+      where: { caseId: parseInt(req.params.id) },
+      include: { images: true }
+    });
     res.json(devices);
   } catch (err) {
     console.error(err);
@@ -188,7 +204,12 @@ app.get('/cases/:id/export', async (req, res) => {
   try {
     const caseData = await prisma.case.findUnique({
       where: { id: caseId },
-      include: { devices: true },
+      include: {
+        devices: {
+          include: { images: true }
+        }
+      },
+
     });
 
     if (!caseData) return res.status(404).send('Case not found');
@@ -213,12 +234,16 @@ app.get('/cases/:id/export', async (req, res) => {
     archive.append(JSON.stringify(caseData.devices, null, 2), { name: 'metadata.json' });
 
     for (const device of caseData.devices) {
-      if (device.imagePath && fs.existsSync(device.imagePath)) {
-        archive.file(device.imagePath, {
-          name: `images/${device.name.replace(/\s+/g, '_')}.jpg`,
-        });
+      if (Array.isArray(device.images)) {
+        for (const [index, image] of device.images.entries()) {
+          if (fs.existsSync(image.path)) {
+            const imageName = `images/${device.name.replace(/\s+/g, '_')}_${index + 1}${path.extname(image.path)}`;
+            archive.file(image.path, { name: imageName });
+          }
+        }
       }
     }
+
 
     await archive.finalize();
   } catch (err) {

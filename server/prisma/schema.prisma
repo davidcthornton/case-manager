@@ -27,13 +27,22 @@ model Device {
   type         DeviceType
   collectedAt  DateTime
   case         Case      @relation(fields: [caseId], references: [id])
-  caseId       Int
-  imagePath    String?   
-  
+  caseId       Int  
+  images       DeviceImage[]  // 🔗 1-to-many relationship
+
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  @@map("devices")
 }
 
+model DeviceImage {
+  id        Int     @id @default(autoincrement())
+  path      String
+  device    Device  @relation(fields: [deviceId], references: [id])
+  deviceId  Int
+
+  @@map("device_images")
+}
 
 
 

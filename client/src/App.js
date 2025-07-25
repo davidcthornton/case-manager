@@ -33,7 +33,7 @@ function Home() {
 
 
 	useEffect(() => {
-		fetch(serverURL + '/cases')
+		fetch(serverURL + `/cases`)
 			.then(res => res.json())
 			.then(data => setCases(data))
 			.catch(err => console.error('Error loading cases:', err));

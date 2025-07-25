@@ -17,7 +17,7 @@ function EditCase() {
 
   useEffect(() => {
     if (caseId) {
-      fetch(serverURL + '/cases/${caseId}')
+      fetch(serverURL + `/cases/${caseId}`)
         .then(res => res.json())
         .then(data => setCaseData(data))
         .catch(err => console.error('Failed to load case:', err));
@@ -88,7 +88,7 @@ function EditCase() {
   className="gray-button"
   onClick={async () => {
     try {
-      const res = await fetch(serverURL + '/cases/${caseId}', {
+      const res = await fetch(serverURL + `/cases/${caseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

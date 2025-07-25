@@ -26,21 +26,19 @@ const INSTRUCTION_ROUTES = {
 const CollectEvidence = () => {
   const { caseId } = useLocation().state || {};
   const navigate = useNavigate();
-
-  const [imageFile, setImageFile] = useState(null);
-
+  const [imageFile, setImageFile] = useState([]);
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
   const [wasIdentified, setWasIdentified] = useState(false);
 
-	let serverURL;
-	if (!process.env.SERVER_URL) {
-		serverURL = 'http://localhost:4000';
-	} else {
-		serverURL = process.env.SERVER_URL;
-	}
-	console.log("API base URL:", process.env.SERVER_URL);
-	console.log("serverURL is " + serverURL);
+  let serverURL;
+  if (!process.env.SERVER_URL) {
+    serverURL = 'http://localhost:4000';
+  } else {
+    serverURL = process.env.SERVER_URL;
+  }
+  console.log("API base URL:", process.env.SERVER_URL);
+  console.log("serverURL is " + serverURL);
 
   let deviceIdFrontEndURL;
   if (!process.env.DEVICE_ID_FRONTEND) {
@@ -80,10 +78,13 @@ const CollectEvidence = () => {
     formData.append('type', deviceType);
     formData.append('collectedAt', new Date().toISOString());
     formData.append('caseId', caseId);
-    if (imageFile) formData.append('image', imageFile);
+    imageFile.forEach((file, idx) => {
+      formData.append('images', file); // Append with same name 'images'
+    });
+
 
     try {
-      const res = await fetch(serverURL + '/devices', {
+      const res = await fetch(serverURL + `/devices`, {
         method: 'POST',
         body: formData,
       });
@@ -105,7 +106,30 @@ const CollectEvidence = () => {
   return (
     <div className="Page">
       <h1>Collect Evidence</h1>
-      <p>For Case ID: {caseId}</p>
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>Device Type:</label><br />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <select
+            value={deviceType}
+            onChange={(e) => setDeviceType(e.target.value)}
+            style={{ padding: '5px' }}
+          >
+            <option value="">-- Select Type --</option>
+            {DEVICE_TYPES.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+
+          <button
+            className="gray-button"
+            onClick={() => window.open(deviceIdFrontEndURL, '_blank')}
+          >
+            🧠 Help Me Identify
+          </button>
+        </div>
+      </div>
+
 
       <div style={{ marginBottom: '20px' }}>
         <label>Device Name:</label><br />
@@ -122,24 +146,14 @@ const CollectEvidence = () => {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImageFile(e.target.files[0])}
+          multiple
+          onChange={(e) => setImageFile(Array.from(e.target.files))}
         />
+
       </div>
 
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>Device Type:</label><br />
-        <select
-          value={deviceType}
-          onChange={(e) => setDeviceType(e.target.value)}
-          style={{ padding: '5px' }}
-        >
-          <option value="">-- Select Type --</option>
-          {DEVICE_TYPES.map((type) => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
-      </div>
+
 
       {instructionPath && (
         <div style={{ marginTop: '10px' }}>
@@ -158,13 +172,7 @@ const CollectEvidence = () => {
         </div>
       )}
 
-      <button
-        className="gray-button"
-        onClick={() => window.open('http://localhost:3001/', '_blank')}
-        style={{ marginTop: '30px' }}
-      >
-        🧠 Help Me Identify
-      </button>
+
 
       <br /><br />
 
