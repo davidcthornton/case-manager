@@ -31,6 +31,7 @@ function Home() {
 	console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
 	console.log("the serverURL is " + serverURL);
 
+	
 
 	useEffect(() => {
 		fetch(serverURL + `/cases`)
