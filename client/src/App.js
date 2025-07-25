@@ -12,6 +12,7 @@ import SmartphoneInstructions from './smartphoneInstructions';
 import Navbar from './Navbar';
 
 
+
 import './App.css';
 
 import folderIcon from './assets/folder.svg';
