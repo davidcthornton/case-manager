@@ -262,48 +262,14 @@ app.get('/cases/:id/export', async (req, res) => {
 
 
 app.delete('/cases/:id', async (req, res) => {
-  const caseId = parseInt(req.params.id);
+  const id = parseInt(req.params.id);
 
   try {
-    // Step 1: Get all devices linked to the case, including images
-    const devices = await prisma.device.findMany({
-      where: { caseId },
-      include: { images: true },
-    });
-
-    // Step 2: Delete image files and DB records
-    for (const device of devices) {
-      for (const image of device.images) {
-        // Remove image from filesystem
-        if (fs.existsSync(image.path)) {
-          try {
-            fs.unlinkSync(image.path);
-          } catch (err) {
-            console.warn(`Failed to delete image file: ${image.path}`);
-          }
-        }
-      }
-
-      // Delete image records
-      await prisma.image.deleteMany({
-        where: { deviceId: device.id },
-      });
-    }
-
-    // Step 3: Delete devices themselves
-    await prisma.device.deleteMany({
-      where: { caseId },
-    });
-
-    // Step 4: Delete the case
-    await prisma.case.delete({
-      where: { id: caseId },
-    });
-
-    res.status(200).json({ message: 'Case and all associated data deleted successfully.' });
+    await prisma.case.delete({ where: { id } });
+    res.status(200).json({ message: 'Case and all related data deleted via cascade.' });
   } catch (err) {
-    console.error('Error during case deletion:', err);
-    res.status(500).json({ error: 'Failed to delete case and related data.' });
+    console.error('Error deleting case:', err);
+    res.status(500).json({ error: 'Failed to delete case.' });
   }
 });
 

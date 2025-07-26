@@ -26,9 +26,9 @@ model Device {
   name         String
   type         DeviceType
   collectedAt  DateTime
-  case         Case      @relation(fields: [caseId], references: [id])
+  case        Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
   caseId       Int  
-  images       DeviceImage[]  // 🔗 1-to-many relationship
+  images       DeviceImage[]  
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -38,7 +38,7 @@ model Device {
 model DeviceImage {
   id        Int     @id @default(autoincrement())
   path      String
-  device    Device  @relation(fields: [deviceId], references: [id])
+  device    Device  @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   deviceId  Int
 
   @@map("device_images")
@@ -52,7 +52,7 @@ model Case {
   eventDate  DateTime
   eventTime  String   // storing time as a string (e.g. '14:30')
   crimeType  CrimeType
-  devices      Device[]
+  devices     Device[]  
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
