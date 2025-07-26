@@ -113,6 +113,34 @@ const ManageCase = () => {
 
         </ul>
       )}
+
+
+      <br /><br />
+
+      <button
+        className="red-button"
+        onClick={async () => {
+          if (!window.confirm("Are you sure you want to delete this case? This action cannot be undone.")) return;
+
+          try {
+            const res = await fetch(serverURL + `/cases/${caseId}`, {
+              method: 'DELETE',
+            });
+
+            if (!res.ok) {
+              throw new Error("Failed to delete the case.");
+            }
+
+            alert("Case deleted successfully.");
+            navigate('/'); // Go back to the main page (App.js root)
+          } catch (err) {
+            alert(err.message);
+          }
+        }}
+      >
+        🗑️ Delete Case
+      </button>
+
     </div>
   );
 };
