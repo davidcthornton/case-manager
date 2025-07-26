@@ -53,6 +53,7 @@ const CollectEvidence = () => {
   // Handle messages from identification tool
   useEffect(() => {
     const handleMessage = (event) => {
+      console.log(event.origin);
       if (event.origin !== deviceIdFrontEndURL) return;
       const { deviceName, deviceType } = event.data || {};
 
