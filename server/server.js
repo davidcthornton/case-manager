@@ -155,7 +155,7 @@ app.put('/cases/:id', async (req, res) => {
   }
 });
 
-/*
+
 app.post('/devices', async (req, res) => {
   const { name, type, collectedAt, caseId } = req.body;
 
@@ -175,15 +175,18 @@ app.post('/devices', async (req, res) => {
     res.status(500).json({ error: 'Failed to create device' });
   }
 });
-*/
+
 
 app.get('/cases/:id/devices', async (req, res) => {
   const id = parseInt(req.params.id);
+  console.log("Fetching devices for case ID:", id);
+
   try {
     const devices = await prisma.device.findMany({
       where: { caseId: parseInt(req.params.id) },
       include: { images: true }
     });
+    console.log("Found devices:", devices);
     res.json(devices);
   } catch (err) {
     console.error(err);
