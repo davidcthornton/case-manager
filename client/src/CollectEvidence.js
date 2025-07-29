@@ -45,7 +45,8 @@ const CollectEvidence = () => {
   if (!process.env.REACT_APP_DEVICE_ID_FRONTEND) {
     deviceIdFrontEndURL = 'http://localhost:3001';
   } else {
-    deviceIdFrontEndURL = process.env.REACT_APP_DEVICE_ID_FRONTEND;
+    //deviceIdFrontEndURL = process.env.REACT_APP_DEVICE_ID_FRONTEND;
+    deviceIdFrontEndURL = 'http://deviceidentifier.gamificationsoftware.org';
   }
   console.log("device id front end URL:", process.env.REACT_APP_DEVICE_ID_FRONTEND);
   console.log("serverURL is " + deviceIdFrontEndURL);
