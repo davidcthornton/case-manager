@@ -14,7 +14,7 @@ const DEVICE_TYPES = [
 
 const INSTRUCTION_ROUTES = {
   smartphone: '/smartphoneInstructions',
-  laptop: '/laptopInstructions',
+  laptop: '/desktopInstructions',
   removablemedia: '/removableMediaInstructions',
   externaldrive: '/removableMediaInstructions',
   router: '/routerInstructions',

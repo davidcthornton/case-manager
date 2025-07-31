@@ -7,6 +7,8 @@ import ManageCase from './ManageCase';
 import CollectEvidence from './CollectEvidence';
 import RemovableMediaInstructions from './RemovableMediaInstructions';
 import SmartphoneInstructions from './smartphoneInstructions';
+import DesktopLaptopConsoleInstructions from './DesktopLaptopConsoleInstructions';
+
 import Navbar from './Navbar';
 import './App.css';
 import folderIcon from './assets/folder.svg';
@@ -95,6 +97,7 @@ function App() {
 				<Route path="/collectevidence" element={<CollectEvidence />} />
 				<Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
 				<Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
+				<Route path="/desktopInstructions" element={<DesktopLaptopConsoleInstructions />} />				
 			</Routes>
 		</>
 	);
