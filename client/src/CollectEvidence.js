@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const [showInstructions, setShowInstructions] = useState(false);
-
 const DEVICE_TYPES = [
   'desktop',
   'laptop',
