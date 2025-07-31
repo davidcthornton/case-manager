@@ -1,4 +1,3 @@
-// NewCase.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,8 +15,8 @@ function NewCase() {
     //serverURL = process.env.REACT_APP_SERVER_URL;
     serverURL = '/api';
   }
-  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
-  console.log("serverURL is " + serverURL);
+  //console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
+  //console.log("serverURL is " + serverURL);
 
   const handleSubmit = async () => {
     if (!caseNumber || !eventDate || !eventTime || !crimeType) {
@@ -47,12 +46,9 @@ function NewCase() {
       }
 
       const saved = await res.json();
-      console.log('Case saved:', saved);
-
-      // Optional: keep session storage if needed
+      //console.log('Case saved:', saved);
       sessionStorage.setItem('caseData', JSON.stringify(saved));
 
-      //navigate('/managecase');
       navigate('/managecase', { state: { caseId: saved.id } });
 
     } catch (error) {
@@ -60,7 +56,6 @@ function NewCase() {
       alert(`Failed to create case: ${error.message}`);
     }
   };
-
 
 
   return (

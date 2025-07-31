@@ -2,15 +2,15 @@ import React from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 
-import airplaneModeImage from './assets/airplaneMode.png'; 
-import smartphoneInBagWithChargerImage from './assets/smartphoneInBagWithCharger.png'; 
+import airplaneModeImage from './assets/airplaneMode.png';
+import smartphoneInBagWithChargerImage from './assets/smartphoneInBagWithCharger.png';
 
 const cardStyle = {
   height: '100vh',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  fontSize: '1.25rem',
+  fontSize: '1rem',
   backgroundColor: '#f0f0f0',
   padding: '2rem',
   boxSizing: 'border-box',
@@ -123,7 +123,7 @@ const SwipeableCards = () => {
 
   const handleDone = () => {
     /*navigate('/collectevidence');*/
-	navigate(-1);
+    navigate(-1);
   };
 
   return (
@@ -133,6 +133,29 @@ const SwipeableCards = () => {
         <h2>{cards[index].title}</h2>
         <div>{cards[index].text}</div>
       </div>
+
+
+
+      <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+        <button
+          style={{ ...buttonStyle, backgroundColor: '#6c757d' }}
+          onClick={() => setIndex((i) => Math.max(i - 1, 0))}
+          disabled={index === 0}
+        >
+          ◀️ Previous
+        </button>
+        <button
+          style={{ ...buttonStyle, backgroundColor: '#6c757d' }}
+          onClick={() => setIndex((i) => Math.min(i + 1, cards.length - 1))}
+          disabled={index === cards.length - 1}
+        >
+          Next ▶️
+        </button>
+      </div>
+
+
+
+
       <button style={buttonStyle} onClick={handleDone}>Done</button>
     </div>
   );

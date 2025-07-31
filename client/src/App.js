@@ -1,8 +1,6 @@
-// App.js
+
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import Page1 from './Page1';
-import Page2 from './Page2';
 import EditCase from './EditCase';
 import NewCase from './NewCase';
 import ManageCase from './ManageCase';
@@ -21,7 +19,6 @@ function Home() {
 	const [users, setUsers] = useState([]);
 	const [cases, setCases] = useState([]);
 
-
 	let serverURL;
 	if (!process.env.REACT_APP_SERVER_URL) {
 		serverURL = 'http://localhost:4000';
@@ -29,10 +26,8 @@ function Home() {
 		//serverURL = process.env.REACT_APP_SERVER_URL;
 		serverURL = '/api';
 	}
-	console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
-	console.log("the serverURL is " + serverURL);
-
-	
+	//console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
+	//console.log("the serverURL is " + serverURL);
 
 	useEffect(() => {
 		fetch(serverURL + `/cases`)
@@ -41,7 +36,7 @@ function Home() {
 			.catch(err => console.error('Error loading cases:', err));
 	}, []);
 
-	
+
 	return (
 		<div className="Page">
 			<h1>Case Manager 1.0</h1>
@@ -66,7 +61,6 @@ function Home() {
 					))}
 				</select>
 
-
 				<br /><br />
 
 				<button
@@ -84,14 +78,9 @@ function Home() {
 
 			</div>
 
-
-
-
 		</div>
 	);
 }
-
-
 
 
 function App() {
@@ -100,8 +89,6 @@ function App() {
 			<Navbar />
 			<Routes>
 				<Route path="/" element={<Home />} />
-				<Route path="/page1" element={<Page1 />} />
-				<Route path="/page2" element={<Page2 />} />
 				<Route path="/editcase" element={<EditCase />} />
 				<Route path="/newcase" element={<NewCase />} />
 				<Route path="/managecase" element={<ManageCase />} />

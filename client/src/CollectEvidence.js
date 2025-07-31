@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+const [showInstructions, setShowInstructions] = useState(false);
+
 const DEVICE_TYPES = [
   'desktop',
   'laptop',
@@ -38,8 +40,8 @@ const CollectEvidence = () => {
     //serverURL = process.env.REACT_APP_SERVER_URL;
     serverURL = '/api';
   }
-  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
-  console.log("serverURL is " + serverURL);
+  //console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
+  //console.log("serverURL is " + serverURL);
 
   let deviceIdFrontEndURL;
   if (!process.env.REACT_APP_DEVICE_ID_FRONTEND) {
@@ -48,8 +50,8 @@ const CollectEvidence = () => {
     //deviceIdFrontEndURL = process.env.REACT_APP_DEVICE_ID_FRONTEND;
     deviceIdFrontEndURL = 'https://deviceidentifier.gamificationsoftware.org';
   }
-  console.log("device id front end URL:", process.env.REACT_APP_DEVICE_ID_FRONTEND);
-  console.log("serverURL is " + deviceIdFrontEndURL);
+  //console.log("device id front end URL:", process.env.REACT_APP_DEVICE_ID_FRONTEND);
+  //console.log("serverURL is " + deviceIdFrontEndURL);
 
 
   // Handle messages from identification tool
@@ -155,9 +157,6 @@ const CollectEvidence = () => {
 
       </div>
 
-
-
-
       {instructionPath && (
         <div style={{ marginTop: '10px' }}>
           <button
@@ -174,8 +173,6 @@ const CollectEvidence = () => {
           Device identified: <strong>{deviceName}</strong> ({deviceType})
         </div>
       )}
-
-
 
       <br /><br />
 

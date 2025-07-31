@@ -1,4 +1,3 @@
-// ManageCase.js
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -14,8 +13,8 @@ const ManageCase = () => {
     //serverURL = process.env.REACT_APP_SERVER_URL;
     serverURL = '/api';
   }
-  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
-  console.log("serverURL is " + serverURL);
+  //console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
+  //console.log("serverURL is " + serverURL);
 
   useEffect(() => {
     if (caseId) {
@@ -31,15 +30,16 @@ const ManageCase = () => {
   return (
     <div className="Page">
       <h1>Manage Case</h1>
+      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <h3 style={{ color: 'gray', marginTop: '-10px' }}>Case ID: {caseId}</h3>
+      </div>
       <button
         className="gray-button"
         onClick={() => navigate('/editcase', { state: { caseId } })}
       >
         ✏️ Edit Details
       </button>
-
       <br /><br />
-
 
       <button
         className="gray-button"
@@ -47,10 +47,7 @@ const ManageCase = () => {
       >
         📦 Collect Evidence
       </button>
-
-
       <br /><br />
-
 
       <button
         className="gray-button"
@@ -75,10 +72,6 @@ const ManageCase = () => {
       >
         ⬇️ Download Evidence ZIP
       </button>
-
-
-
-
 
 
       <hr style={{ margin: '30px 0' }} />
@@ -107,17 +100,14 @@ const ManageCase = () => {
                 </div>
               )}
 
-
             </li>
           ))}
-
 
         </ul>
       )}
 
 
       <br /><br />
-
       <button
         className="red-button"
         onClick={async () => {
