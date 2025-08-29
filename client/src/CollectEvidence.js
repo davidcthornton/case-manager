@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const DEVICE_TYPES = [
-  'desktop',
-  'laptop',
-  'smartphone',
-  'tablet',
-  'externaldrive',
-  'removablemedia',
-  'router',
-  'other'
+  { value: 'desktop', label: 'Desktop' },
+  { value: 'laptop', label: 'Laptop' },
+  { value: 'smartphone', label: 'Smartphone' },
+  { value: 'tablet', label: 'Tablet' },
+  { value: 'externaldrive', label: 'External Drive' },
+  { value: 'removablemedia', label: 'Removable Media' },
+  { value: 'router', label: 'Router' },
+  { value: 'other', label: 'Other' },
 ];
 
 const INSTRUCTION_ROUTES = {
@@ -119,8 +119,8 @@ const CollectEvidence = () => {
             style={{ padding: '5px' }}
           >
             <option value="">-- Select Type --</option>
-            {DEVICE_TYPES.map((type) => (
-              <option key={type} value={type}>{type}</option>
+            {DEVICE_TYPES.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
 
