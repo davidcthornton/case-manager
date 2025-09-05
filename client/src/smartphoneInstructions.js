@@ -79,7 +79,7 @@ const cards = [
         <img
           src={airplaneModeImage}
           alt="Description of image"
-          style={{ width: '100%', height: 'auto' }}
+          style={{ width: '70%', height: 'auto' }}
         />
       </div>
     )
@@ -92,7 +92,7 @@ const cards = [
         <img
           src={smartphoneInBagWithChargerImage}
           alt="Description of image"
-          style={{ width: '100%', height: 'auto' }}
+          style={{ width: '70%', height: 'auto' }}
         />
         <p>Work with crime scene service technicians or trained forensic personnel to preserve forensic evidence (fingerprints, biological samples, DNA, etc.) without disturbing the integrity of the device.</p>
       </div>

@@ -8,6 +8,7 @@ import CollectEvidence from './CollectEvidence';
 import RemovableMediaInstructions from './RemovableMediaInstructions';
 import SmartphoneInstructions from './smartphoneInstructions';
 import DesktopLaptopConsoleInstructions from './DesktopLaptopConsoleInstructions';
+import OtherInstructions from './OtherInstructions';
 
 import Navbar from './Navbar';
 import './App.css';
@@ -97,7 +98,8 @@ function App() {
 				<Route path="/collectevidence" element={<CollectEvidence />} />
 				<Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
 				<Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
-				<Route path="/desktopInstructions" element={<DesktopLaptopConsoleInstructions />} />				
+				<Route path="/desktopLaptopConsoleInstructions" element={<DesktopLaptopConsoleInstructions />} />				
+				<Route path="/otherInstructions" element={<OtherInstructions />} />				
 			</Routes>
 		</>
 	);

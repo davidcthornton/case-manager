@@ -2,8 +2,6 @@ import React from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 
-import takingPhotoOfDesktop from './assets/takingPhotoOfDesktop.png';
-
 const cardStyle = {
   height: '100vh',
   display: 'flex',
@@ -41,79 +39,32 @@ const cards = [
   {
     title: 'Document Device and Procedures',
     text: (
-      <div>
-        <img
-          src={takingPhotoOfDesktop}
-          alt="Description of image"
-          style={{ width: '70%', height: 'auto' }}
-        />
-        <ul>
-          <li>Photograph</li>
-          <li>Video</li>
-          <li>Sketch</li>
-          <li>Notes</li>
-          <li>Chain of custody</li>
-        </ul>
-      </div>
-    )
-  },
-  {
-    title: 'Determine if the Device is On or Off',
-    text: (
       <ul>
-        <li>Look for lights</li>
-        <li>Listen for sounds</li>
-        <li>Feel for vibrations or heat</li>
-        <li>Ask if the device is currently powered on.</li>
-        <li>Where legal, pressing the home button quickly will activate the screen.</li>
-      </ul>
-    )
-  },
-  {
-    title: 'If the Device Is Off, Do Not Turn It On',
-    text: <p>(Do not take any action that could change the state of the device.)</p>
-  },
-  {
-    title: 'If the Device Is On, Proceed with Caution',
-    text: (
-      <ul>
-        <li>Do not type, click the mouse, or explore files or directories without expert consultation.</li>
-        <li>Ask about passwords and/or encryption of the system.</li>
-        <li>Observe the screen for open programs, files, or indications of encryption.</li>
-        <li>If concerned, consult an expert and photograph the screen.</li>
-      </ul>
-    )
-  },
-  {
-    title: 'Power Down the System',
-    text: (
-      <ul>
-        <li>Pull the plug from the back of the computer system.</li>
-        <li>Remove the battery from a laptop system, if possible.</li>
+        <li>Photograph</li>
+        <li>Video</li>
+        <li>Sketch</li>
+        <li>Notes</li>
+        <li>Chain of custody</li>
       </ul>
     )
   },
   {
     title: 'Collection and Packaging',
     text: (
-      <ul>
-        <li>Preserve forensic evidence with trained personnel.</li>
-        <li>Photograph the system from all perspectives.</li>
-        <li>Mark and document all items clearly.</li>
-        <li>Disconnect and secure cables.</li>
-        <li>Check ports and trays for removable media.</li>
-        <li>Package with laptop bags, boxes, or evidence bags.</li>
-      </ul>
+      <div>
+        <p>If available, static-free evidence bags are best for the storage of media.</p>
+        <p>Work with crime scene service technicians or trained forensic personnel to preserve forensic evidence (fingerprints, biological samples, DNA, etc.) without disturbing the integrity of the device.</p>
+      </div>
     )
   },
   {
     title: 'Transport',
     text: (
-      <ul>
-        <li>Deliver to a secure law enforcement or forensic facility promptly.</li>
-        <li>Protect the device from heat, cold, and moisture.</li>
-        <li>Package to prevent physical damage.</li>
-      </ul>
+      <div>
+        <p>Deliver evidence to a secure law enforcement facility or digital evidence laboratory as soon as possible.</p>
+        <p>Protect the device from temperature extremes and moisture.</p>
+        <p>Package evidence so it will not be physically damaged or deformed.</p>
+      </div>
     )
   }
 ];
@@ -129,6 +80,7 @@ const SwipeableCards = () => {
   });
 
   const handleDone = () => {
+    /*navigate('/collectevidence'); */
     window.close();
   };
 
@@ -156,6 +108,9 @@ const SwipeableCards = () => {
           Next ▶️
         </button>
       </div>
+
+
+
 
       <button style={buttonStyle} onClick={handleDone}>Done</button>
     </div>

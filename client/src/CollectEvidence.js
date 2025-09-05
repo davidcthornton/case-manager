@@ -14,12 +14,12 @@ const DEVICE_TYPES = [
 
 const INSTRUCTION_ROUTES = {
   smartphone: '/smartphoneInstructions',
-  laptop: '/desktopInstructions',
+  laptop: '/desktopLaptopConsoleInstructions',
   removablemedia: '/removableMediaInstructions',
   externaldrive: '/removableMediaInstructions',
-  router: '/routerInstructions',
-  desktop: '/desktopInstructions',
-  tablet: '/tabletInstructions',
+  router: '/otherInstructions',
+  desktop: '/desktopLaptopConsoleInstructions',
+  tablet: '/smartphoneInstructions',
   other: '/otherInstructions',
 };
 
@@ -160,7 +160,11 @@ const CollectEvidence = () => {
           multiple
           onChange={(e) => setImageFile(Array.from(e.target.files))}
         />
-
+        {imageFile.length > 0 && (
+          <p style={{ marginTop: 8 }}>
+            {`Selected ${imageFile.length} image${imageFile.length > 1 ? 's' : ''}`}
+          </p>
+        )}
       </div>
 
       {instructionPath && (
