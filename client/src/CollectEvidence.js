@@ -57,11 +57,19 @@ const CollectEvidence = () => {
     const handleMessage = (event) => {
       console.log(event.origin);
       if (event.origin !== deviceIdFrontEndURL) return;
-      const { deviceName, deviceType } = event.data || {};
+      const { deviceName, deviceType, images } = event.data || {};
 
-      if (deviceName && deviceType) {
-        setDeviceName(deviceName);
-        setDeviceType(deviceType);
+
+      // Update fields if provided
+      if (deviceName) setDeviceName(deviceName);
+      if (deviceType) setDeviceType(deviceType);
+
+      // NEW: accept optional array of File/Blob objects
+      if (Array.isArray(images) && images.length) {
+        // If they’re File/Blob instances, we can store them as-is.
+        setImageFile(images);
+      }
+      if (deviceName || deviceType || (images && images.length)) {
         setWasIdentified(true);
       }
     };
@@ -159,7 +167,7 @@ const CollectEvidence = () => {
         <div style={{ marginTop: '10px' }}>
           <button
             className="gray-button"
-            onClick={() => navigate(instructionPath)}
+            onClick={() => window.open(instructionPath, '_blank', 'noopener,noreferrer')}
           >
             📄 Collection Instructions
           </button>

@@ -120,7 +120,7 @@ const SwipeableCards = () => {
   });
 
   const handleDone = () => {
-    navigate(-1);
+    window.close();
   };
 
   return (

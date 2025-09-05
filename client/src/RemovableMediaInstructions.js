@@ -81,7 +81,7 @@ const SwipeableCards = () => {
 
   const handleDone = () => {
     /*navigate('/collectevidence'); */
-    navigate(-1);
+    window.close();
   };
 
   return (
