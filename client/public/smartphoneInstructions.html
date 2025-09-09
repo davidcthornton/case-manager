@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Smartphone Collection Instructions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f0f0f0;
+      --card-bg: #fff;
+      --accent: #007BFF;
+      --muted: #6c757d;
+      --shadow: 0 4px 10px rgba(0,0,0,0.1);
+      --radius-lg: 1rem;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: #111;
+    }
+    .page {
+      /*min-height: 100vh;*/
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      width: 80%;
+      max-width: 600px;
+      text-align: left;
+    }
+    .index {
+      margin-bottom: 1rem;
+      font-weight: bold;
+    }
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-muted {
+      background: var(--muted);
+      color: #fff;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    img.responsive {
+      width: 70%;
+      height: auto;
+      display: block;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="page">
+    <div class="card">
+      <div class="index" id="idx">1/6</div>
+      <h2 id="title">Loading…</h2>
+      <div id="content">Please wait…</div>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-muted" id="prevBtn">◀️ Previous</button>
+      <button class="btn btn-muted" id="nextBtn">Next ▶️</button>
+    </div>
+
+    <button class="btn btn-primary" id="doneBtn">Done</button>
+  </div>
+
+  <script>
+    // --- Data (mirrors your React cards) ---
+    const cards = [
+      {
+        title: 'Document Device and Procedures',
+        html: `
+          <ul>
+            <li>Photograph</li>
+            <li>Video</li>
+            <li>Sketch</li>
+            <li>Notes</li>
+            <li>Chain of custody</li>
+          </ul>
+        `
+      },
+      {
+        title: 'Determine if the Device is On or Off',
+        html: `
+          <ul>
+            <li>Look for lights</li>
+            <li>Listen for sounds</li>
+            <li>Feel for vibrations or heat</li>
+            <li>Ask if the device is currently powered on.</li>
+            <li>Where legal, pressing the home button quickly will activate the screen.</li>
+          </ul>
+        `
+      },
+      {
+        title: 'If the Device Is Off, Do Not Turn It On',
+        html: `<p>(No additional action should be taken that could modify the device’s state.)</p>`
+      },
+      {
+        title: 'If the Device Is On, Proceed with Caution',
+        html: `
+          <div>
+            <p>If possible, obtain security passwords or pass patterns for the device.</p>
+            <p>Avoid turning the device off, as this could result in the loss of evidence.</p>
+            <p>If possible, connect device to a charger to keep it powered</p>
+            <p>Keep it unlocked</p>
+            <p>Place it in airplane mode until it is in the hands of an experienced technician.</p>
+            <img class="responsive" src="/assets/airplaneMode.png" alt="Airplane mode icon" />
+          </div>
+        `
+      },
+      {
+        title: 'Collection and Packaging',
+        html: `
+          <div>
+            <p>If available, Faraday evidence bags or else static-free evidence bags are best for the storage of mobile devices.</p>
+            <img class="responsive" src="/assets/smartphoneInBagWithCharger.png" alt="Smartphone in evidence bag with charger" />
+            <p>Work with crime scene service technicians or trained forensic personnel to preserve forensic evidence (fingerprints, biological samples, DNA, etc.) without disturbing the integrity of the device.</p>
+          </div>
+        `
+      },
+      {
+        title: 'Transport',
+        html: `
+          <div>
+            <p>Deliver evidence to a secure law enforcement facility or digital evidence laboratory as soon as possible.</p>
+            <p>This is especially important for mobile devices, where even a short delay can make it challenging and slow to collect digital forensic evidence.</p>
+            <p>Protect the device from temperature extremes and moisture.</p>
+            <p>Package evidence so it will not be physically damaged or deformed.</p>
+          </div>
+        `
+      }
+    ];
+
+    // --- DOM refs ---
+    const idxEl = document.getElementById('idx');
+    const titleEl = document.getElementById('title');
+    const contentEl = document.getElementById('content');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const doneBtn = document.getElementById('doneBtn');
+    const page = document.getElementById('page');
+
+    // --- State ---
+    let index = 0;
+
+    function render() {
+      const total = cards.length;
+      const card = cards[index];
+      idxEl.textContent = `${index + 1}/${total}`;
+      titleEl.textContent = card.title;
+      contentEl.innerHTML = card.html;
+      prevBtn.disabled = (index === 0);
+      nextBtn.disabled = (index === total - 1);
+    }
+
+    // Button handlers
+    prevBtn.addEventListener('click', () => {
+      index = Math.max(0, index - 1);
+      render();
+    });
+    nextBtn.addEventListener('click', () => {
+      index = Math.min(cards.length - 1, index + 1);
+      render();
+    });
+    doneBtn.addEventListener('click', () => {
+      // Try to close (works if script-opened)
+      window.close();
+    });
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        prevBtn.click();
+      } else if (e.key === 'ArrowRight') {
+        nextBtn.click();
+      } else if (e.key === 'Escape') {
+        window.close();
+      }
+    });
+
+    // Swipe (touch & mouse)
+    let startX = null;
+    let isMouseDown = false;
+
+    function handleStart(x) { startX = x; }
+    function handleEnd(x) {
+      if (startX == null) return;
+      const dx = x - startX;
+      const THRESHOLD = 50;
+      if (dx <= -THRESHOLD) nextBtn.click();
+      if (dx >= THRESHOLD) prevBtn.click();
+      startX = null;
+    }
+
+    // Touch
+    page.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX), {passive: true});
+    page.addEventListener('touchend',   (e) => handleEnd((e.changedTouches && e.changedTouches[0] ? e.changedTouches[0].clientX : null) ?? 0));
+
+    // Mouse drag
+    page.addEventListener('mousedown', (e) => { isMouseDown = true; handleStart(e.clientX); });
+    page.addEventListener('mouseup',   (e) => { if (isMouseDown) handleEnd(e.clientX); isMouseDown = false; });
+    page.addEventListener('mouseleave',() => { isMouseDown = false; startX = null; });
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

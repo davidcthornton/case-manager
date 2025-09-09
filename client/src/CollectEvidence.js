@@ -13,14 +13,14 @@ const DEVICE_TYPES = [
 ];
 
 const INSTRUCTION_ROUTES = {
-  smartphone: '/smartphoneInstructions',
-  laptop: '/desktopLaptopConsoleInstructions',
-  removablemedia: '/removableMediaInstructions',
-  externaldrive: '/removableMediaInstructions',
-  router: '/otherInstructions',
-  desktop: '/desktopLaptopConsoleInstructions',
-  tablet: '/smartphoneInstructions',
-  other: '/otherInstructions',
+  smartphone: '/smartphoneInstructions.html',
+  laptop: '/desktopLaptopConsoleInstructions.html',
+  removablemedia: '/removableMediaInstructions.html',
+  externaldrive: '/removableMediaInstructions.html',
+  router: '/otherInstructions.html',
+  desktop: '/desktopLaptopConsoleInstructions.html',
+  tablet: '/smartphoneInstructions.html',
+  other: '/otherInstructions.html',
 };
 
 const CollectEvidence = () => {

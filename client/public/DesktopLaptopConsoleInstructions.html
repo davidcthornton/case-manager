@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Desktop/Laptop/Console Collection Instructions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preload" href="/assets/takingPhotoOfDesktop.png" as="image">
+  <style>
+    :root {
+      --bg: #f0f0f0;
+      --card-bg: #fff;
+      --accent: #007BFF;
+      --muted: #6c757d;
+      --shadow: 0 4px 10px rgba(0,0,0,0.1);
+      --radius-lg: 1rem;
+    }
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: #111;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      gap: 1rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      width: 80%;
+      max-width: 600px;
+      text-align: left;
+    }
+    .index { margin-bottom: 1rem; font-weight: bold; }
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-muted { background: var(--muted); color: #fff; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    img.responsive { width: 70%; height: auto; display: block; margin: 0.5rem 0; }
+    noscript { color: #b00020; }
+  </style>
+</head>
+<body>
+  <div class="page" id="page">
+    <div class="card">
+      <div class="index" id="idx">1/7</div>
+      <h2 id="title">Loading…</h2>
+      <div id="content">Please wait…</div>
+      <noscript>This page requires JavaScript to display the instructions.</noscript>
+    </div>
+
+    <div class="nav">
+      <button class="btn btn-muted" id="prevBtn">◀️ Previous</button>
+      <button class="btn btn-muted" id="nextBtn">Next ▶️</button>
+    </div>
+
+    <button class="btn btn-primary" id="doneBtn">Done</button>
+  </div>
+
+  <!-- Inline script version -->
+  <script>
+    (function () {
+      function init() {
+        const cards = [
+          {
+            title: 'Document Device and Procedures',
+            html: `
+              <div>
+                <img class="responsive" src="/assets/takingPhotoOfDesktop.png" alt="Taking photo of desktop" />
+                <ul>
+                  <li>Photograph</li>
+                  <li>Video</li>
+                  <li>Sketch</li>
+                  <li>Notes</li>
+                  <li>Chain of custody</li>
+                </ul>
+              </div>
+            `
+          },
+          {
+            title: 'Determine if the Device is On or Off',
+            html: `
+              <ul>
+                <li>Look for lights</li>
+                <li>Listen for sounds</li>
+                <li>Feel for vibrations or heat</li>
+                <li>Ask if the device is currently powered on.</li>
+                <li>Where legal, pressing the home button quickly will activate the screen.</li>
+              </ul>
+            `
+          },
+          {
+            title: 'If the Device Is Off, Do Not Turn It On',
+            html: `<p>(Do not take any action that could change the state of the device.)</p>`
+          },
+          {
+            title: 'If the Device Is On, Proceed with Caution',
+            html: `
+              <ul>
+                <li>Do not type, click the mouse, or explore files or directories without expert consultation.</li>
+                <li>Ask about passwords and/or encryption of the system.</li>
+                <li>Observe the screen for open programs, files, or indications of encryption.</li>
+                <li>If concerned, consult an expert and photograph the screen.</li>
+              </ul>
+            `
+          },
+          {
+            title: 'Power Down the System',
+            html: `
+              <ul>
+                <li>Pull the plug from the back of the computer system.</li>
+                <li>Remove the battery from a laptop system, if possible.</li>
+              </ul>
+            `
+          },
+          {
+            title: 'Collection and Packaging',
+            html: `
+              <ul>
+                <li>Preserve forensic evidence with trained personnel.</li>
+                <li>Photograph the system from all perspectives.</li>
+                <li>Mark and document all items clearly.</li>
+                <li>Disconnect and secure cables.</li>
+                <li>Check ports and trays for removable media.</li>
+                <li>Package with laptop bags, boxes, or evidence bags.</li>
+              </ul>
+            `
+          },
+          {
+            title: 'Transport',
+            html: `
+              <ul>
+                <li>Deliver to a secure law enforcement or forensic facility promptly.</li>
+                <li>Protect the device from heat, cold, and moisture.</li>
+                <li>Package to prevent physical damage.</li>
+              </ul>
+            `
+          }
+        ];
+
+        const idxEl = document.getElementById('idx');
+        const titleEl = document.getElementById('title');
+        const contentEl = document.getElementById('content');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const doneBtn = document.getElementById('doneBtn');
+        const page = document.getElementById('page');
+
+        if (!idxEl || !titleEl || !contentEl) return;
+
+        let index = 0;
+        function render() {
+          const total = cards.length;
+          const card = cards[index];
+          idxEl.textContent = (index + 1) + "/" + total;
+          titleEl.textContent = card.title;
+          contentEl.innerHTML = card.html;
+          prevBtn.disabled = (index === 0);
+          nextBtn.disabled = (index === total - 1);
+        }
+
+        prevBtn.addEventListener('click', () => { index = Math.max(0, index - 1); render(); });
+        nextBtn.addEventListener('click', () => { index = Math.min(cards.length - 1, index + 1); render(); });
+
+        // Done: try to close self; also message opener as a fallback
+        function finish() {
+          window.close();
+          try {
+            if (window.opener && !window.opener.closed) {
+              window.opener.postMessage({ type: 'instructionDone', source: 'desktop' }, window.location.origin);
+            }
+          } catch (e) { /* ignore cross-origin */ }
+        }
+        doneBtn.addEventListener('click', finish);
+
+        // Keyboard navigation
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowLeft') prevBtn.click();
+          else if (e.key === 'ArrowRight') nextBtn.click();
+          else if (e.key === 'Escape') finish();
+        });
+
+        // Basic swipe support (touch + mouse drag)
+        let startX = null, isMouseDown = false;
+        function start(x) { startX = x; }
+        function end(x) {
+          if (startX == null || x == null) return;
+          const dx = x - startX;
+          const THRESHOLD = 50;
+          if (dx <= -THRESHOLD) nextBtn.click();
+          if (dx >= THRESHOLD) prevBtn.click();
+          startX = null;
+        }
+        page.addEventListener('touchstart', (e) => start(e.touches[0].clientX), { passive: true });
+        page.addEventListener('touchend', (e) => { const t = e.changedTouches && e.changedTouches[0]; end(t ? t.clientX : null); });
+        page.addEventListener('mousedown', (e) => { isMouseDown = true; start(e.clientX); });
+        page.addEventListener('mouseup', (e) => { if (isMouseDown) end(e.clientX); isMouseDown = false; });
+        page.addEventListener('mouseleave', () => { isMouseDown = false; startX = null; });
+
+        render();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
