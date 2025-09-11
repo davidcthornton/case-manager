@@ -273,6 +273,49 @@ app.delete('/cases/:id', async (req, res) => {
   }
 });
 
+async function deleteDeviceById(req, res) {
+  const id = Number(req.params.id || req.params.deviceId);
+  if (!Number.isFinite(id)) {
+    return res.status(400).json({ error: 'Invalid device id' });
+  }
+
+  try {
+    // Load device + its DeviceImage rows (relation is named `images`)
+    const device = await prisma.device.findUnique({
+      where: { id },
+      include: { images: true }, // Device.images: DeviceImage[]
+    });
+
+    if (!device) return res.status(404).json({ error: 'Device not found' });
+
+    // Best-effort delete of the files those images point to
+    for (const img of device.images) {
+      const rel = (img.path || '').replace(/^\/+/, '');     // strip leading slashes
+      const abs = path.join(process.cwd(), rel);             // e.g. ./uploads/...
+      try {
+        if (fs.existsSync(abs)) fs.unlinkSync(abs);
+      } catch (e) {
+        console.warn('Failed to delete file:', abs, e.message);
+      }
+    }
+
+    // Because your schema has onDelete: Cascade for DeviceImage,
+    // deleting the Device will also delete its image rows.
+    await prisma.device.delete({ where: { id } });
+
+    return res.status(200).json({ message: 'Device deleted.' });
+  } catch (err) {
+    console.error('Error deleting device:', err);
+    return res.status(500).json({ error: 'Failed to delete device.' });
+  }
+}
+
+// Flat route (simple)
+app.delete('/devices/:id', deleteDeviceById);
+
+// Optional nested route (if your client calls this shape)
+app.delete('/cases/:caseId/devices/:deviceId', deleteDeviceById);
+
 
 
 

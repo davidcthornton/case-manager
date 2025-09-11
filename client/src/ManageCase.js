@@ -5,6 +5,7 @@ const ManageCase = () => {
   const navigate = useNavigate();
   const { caseId } = useLocation().state || {};
   const [devices, setDevices] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
 
   let serverURL;
   if (!process.env.REACT_APP_SERVER_URL) {
@@ -24,6 +25,27 @@ const ManageCase = () => {
         .catch(err => console.error('Failed to fetch devices:', err));
     }
   }, [caseId]);
+
+
+  // Delete a single device
+  const deleteDevice = async (deviceId, deviceName) => {
+    if (!window.confirm(`Delete "${deviceName}"? This cannot be undone.`)) return;
+    try {
+      setDeletingId(deviceId);
+      // If your API uses a different route, adjust this path:      
+      const res = await fetch(serverURL + `/devices/${deviceId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete device.');
+      // Optimistic UI update
+      setDevices(prev => prev.filter(d => d.id !== deviceId));
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
 
   if (!caseId) return <p>No case selected.</p>;
 
@@ -86,6 +108,22 @@ const ManageCase = () => {
             <li key={d.id}>
               {d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
 
+
+              <button
+                title="Delete device"
+                aria-label={`Delete ${d.name}`}
+                onClick={() => deleteDevice(d.id, d.name)}
+                disabled={deletingId === d.id}
+                style={{
+                  marginLeft: '10px',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: deletingId === d.id ? 'not-allowed' : 'pointer',
+                  fontSize: '1rem'
+                }}
+              >
+                🗑️
+              </button>
 
               {Array.isArray(d.images) && d.images.length > 0 && (
                 <div>
