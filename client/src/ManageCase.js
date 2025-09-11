@@ -130,7 +130,11 @@ const ManageCase = () => {
                   {d.images.map((img, i) => (
                     <img
                       key={i}
-                      src={`${serverURL}/${img.path.replace(/^\/+/, '')}`}
+                      src={`${serverURL}/${(img.path || '')
+                        .replace(/^[\\/]+/, '')   // trim any leading / or \
+                        .replace(/\\/g, '/')      // convert all backslashes to forward slashes
+                        }`}
+
                       alt="evidence"
                       style={{ maxWidth: '200px', marginRight: '10px' }}
                     />
