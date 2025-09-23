@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 
 function EditCase() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { caseId } = location.state || {};
   const [caseData, setCaseData] = useState(null);
 
@@ -100,6 +102,7 @@ function EditCase() {
       if (!res.ok) throw new Error('Failed to update case');
 
       alert('Case updated successfully!');
+      navigate('/managecase', { state: { caseId } });
     } catch (err) {
       console.error(err);
       alert('Update failed: ' + err.message);
