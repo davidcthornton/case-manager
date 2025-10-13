@@ -62,7 +62,7 @@ const CollectEvidence = () => {
   useEffect(() => {
     const handleMessage = (event) => {
       console.log(event.origin);
-      if (event.origin !== deviceIdFrontEndURL) return;
+      //if (event.origin !== deviceIdFrontEndURL) return;
       const { deviceName, deviceType, images } = event.data || {};
 
 
