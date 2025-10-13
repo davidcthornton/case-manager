@@ -25,11 +25,17 @@ const INSTRUCTION_ROUTES = {
 
 const CollectEvidence = () => {
   const { caseId } = useLocation().state || {};
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [imageFile, setImageFile] = useState([]);
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
-  const [wasIdentified, setWasIdentified] = useState(false);
+  const [wasIdentified, setWasIdentified] = useState(false);  
+  const appendImages = (files) => {
+    const asArray = Array.from(files || []);
+    setImageFile((prev) => [...prev, ...asArray]);
+  };
+
 
   let serverURL;
   if (!process.env.REACT_APP_SERVER_URL) {
@@ -84,6 +90,9 @@ const CollectEvidence = () => {
       return;
     }
 
+    setLoading(true); // start loading
+
+
     const formData = new FormData();
     formData.append('name', deviceName);
     formData.append('type', deviceType);
@@ -106,7 +115,10 @@ const CollectEvidence = () => {
     } catch (err) {
       console.error(err);
       alert(err.message);
+    } finally {
+      setLoading(false); // stop loading
     }
+
   };
 
 
@@ -143,29 +155,45 @@ const CollectEvidence = () => {
 
 
       <div style={{ marginBottom: '20px' }}>
-        <label>Device Name:</label><br />
-        <input
-          type="text"
-          value={deviceName}
-          onChange={(e) => setDeviceName(e.target.value)}
-          style={{ width: '300px', padding: '5px' }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
         <label>Upload Image:</label><br />
+
+        {/* Regular file picker (folders, gallery, etc.) */}
         <input
           type="file"
           accept="image/*"
           multiple
-          onChange={(e) => setImageFile(Array.from(e.target.files))}
+          onChange={(e) => appendImages(e.target.files)}
         />
+
+        {/* Hidden camera capture input */}
+        <input
+          id="cameraInput"
+          type="file"
+          accept="image/*"
+          capture="environment"    // rear camera when available
+          multiple                  // some mobile browsers ignore multiple; safe to include
+          style={{ display: 'none' }}
+          onChange={(e) => appendImages(e.target.files)}
+        />
+
+        {/* Visible button to trigger camera */}
+        <div style={{ marginTop: 8 }}>
+          <button
+            type="button"
+            className="gray-button"
+            onClick={() => document.getElementById('cameraInput')?.click()}
+          >
+            📷 Take Photos
+          </button>
+        </div>
+
         {imageFile.length > 0 && (
           <p style={{ marginTop: 8 }}>
             {`Selected ${imageFile.length} image${imageFile.length > 1 ? 's' : ''}`}
           </p>
         )}
       </div>
+
 
       {instructionPath && (
         <div style={{ marginTop: '10px' }}>
@@ -186,9 +214,10 @@ const CollectEvidence = () => {
 
       <br /><br />
 
-      <button className="gray-button" onClick={handleSubmit}>
-        ✅ Collect
+      <button className="gray-button" onClick={handleSubmit} disabled={loading}>
+        {loading ? '⏳ Collecting...' : '✅ Collect'}
       </button>
+
     </div>
   );
 };
