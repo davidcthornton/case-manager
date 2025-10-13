@@ -30,7 +30,7 @@ const CollectEvidence = () => {
   const [imageFile, setImageFile] = useState([]);
   const [deviceName, setDeviceName] = useState('');
   const [deviceType, setDeviceType] = useState('');
-  const [wasIdentified, setWasIdentified] = useState(false);  
+  const [wasIdentified, setWasIdentified] = useState(false);
   const appendImages = (files) => {
     const asArray = Array.from(files || []);
     setImageFile((prev) => [...prev, ...asArray]);
@@ -151,6 +151,17 @@ const CollectEvidence = () => {
             🧠 Help Me Identify
           </button>
         </div>
+      </div>
+
+
+      <div style={{ marginBottom: '20px' }}>
+        <label>Device Name:</label><br />
+        <input
+          type="text"
+          value={deviceName}
+          onChange={(e) => setDeviceName(e.target.value)}
+          style={{ width: '300px', padding: '5px' }}
+        />
       </div>
 
 
