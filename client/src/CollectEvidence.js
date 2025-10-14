@@ -225,6 +225,14 @@ const CollectEvidence = () => {
 
       <br /><br />
 
+<button
+  onClick={() => navigate(-1)}
+  className="gray-button"
+  style={{ marginBottom: '1rem' }}
+>
+  ← Back
+</button>
+
       <button className="gray-button" onClick={handleSubmit} disabled={loading}>
         {loading ? '⏳ Collecting...' : '✅ Collect'}
       </button>
