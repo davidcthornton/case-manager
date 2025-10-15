@@ -166,38 +166,50 @@ const CollectEvidence = () => {
 
 
       <div style={{ marginBottom: '20px' }}>
-        <label>Upload Image:</label><br />
 
-        {/* Regular file picker (folders, gallery, etc.) */}
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => appendImages(e.target.files)}
-        />
 
-        {/* Hidden camera capture input */}
-        <input
-          id="cameraInput"
-          type="file"
-          accept="image/*"
-          capture="environment"    // rear camera when available
-          multiple                  // some mobile browsers ignore multiple; safe to include
-          style={{ display: 'none' }}
-          onChange={(e) => appendImages(e.target.files)}
-        />
+        <fieldset
+          style={{
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            padding: '16px',
+            marginTop: '16px',
+          }}
+        >
+          <legend>Upload Image(s):</legend>
 
-        {/* Visible button to trigger camera */}
-        <div style={{ marginTop: 8 }}>
-          <button
-            type="button"
-            className="gray-button"
-            onClick={() => document.getElementById('cameraInput')?.click()}
-          >
-            📷 Take Photos
-          </button>
-        </div>
+          {/* Regular file picker (folders, gallery, etc.) */}
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => appendImages(e.target.files)}
+          />
 
+          <p> or </p>
+
+          {/* Hidden camera capture input */}
+          <input
+            id="cameraInput"
+            type="file"
+            accept="image/*"
+            capture="environment"    // rear camera when available
+            multiple                  // some mobile browsers ignore multiple; safe to include
+            style={{ display: 'none' }}
+            onChange={(e) => appendImages(e.target.files)}
+          />
+
+          {/* Visible button to trigger camera */}
+          <div style={{ marginTop: 8 }}>
+            <button
+              type="button"
+              className="gray-button"
+              onClick={() => document.getElementById('cameraInput')?.click()}
+            >
+              📷 Take Photos
+            </button>
+          </div>
+        </fieldset>
         {imageFile.length > 0 && (
           <p style={{ marginTop: 8 }}>
             {`Selected ${imageFile.length} image${imageFile.length > 1 ? 's' : ''}`}
@@ -206,38 +218,42 @@ const CollectEvidence = () => {
       </div>
 
 
-      {instructionPath && (
-        <div style={{ marginTop: '10px' }}>
-          <button
-            className="gray-button"
-            onClick={() => window.open(instructionPath, '_blank', 'noopener,noreferrer')}
-          >
-            📄 Collection Instructions
-          </button>
-        </div>
-      )}
+      {
+        instructionPath && (
+          <div style={{ marginTop: '10px' }}>
+            <button
+              className="gray-button"
+              onClick={() => window.open(instructionPath, '_blank', 'noopener,noreferrer')}
+            >
+              📄 Collection Instructions
+            </button>
+          </div>
+        )
+      }
 
-      {wasIdentified && (
-        <div style={{ marginTop: '10px', color: 'green' }}>
-          Device identified: <strong>{deviceName}</strong> ({deviceType})
-        </div>
-      )}
+      {
+        wasIdentified && (
+          <div style={{ marginTop: '10px', color: 'green' }}>
+            Device identified: <strong>{deviceName}</strong> ({deviceType})
+          </div>
+        )
+      }
 
       <br /><br />
 
-<button
-  onClick={() => navigate(-1)}
-  className="gray-button"
-  style={{ marginBottom: '1rem' }}
->
-  ← Back
-</button>
+      <button
+        onClick={() => navigate(-1)}
+        className="gray-button"
+        style={{ marginBottom: '1rem' }}
+      >
+        ← Back
+      </button>
 
       <button className="gray-button" onClick={handleSubmit} disabled={loading}>
         {loading ? '⏳ Collecting...' : '✅ Collect'}
       </button>
 
-    </div>
+    </div >
   );
 };
 
