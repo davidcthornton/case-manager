@@ -17,9 +17,38 @@ const ManageCase = () => {
   //console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
   //console.log("serverURL is " + serverURL);
 
+  // Helper: fetch with credentials + one-time refresh-on-401
+  const apiFetch = async (path, init = {}) => {
+    let res = await fetch(serverURL + path, {
+      credentials: 'include',
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init.headers || {})
+      }
+    });
+    if (res.status === 401) {
+      // try to refresh, then retry the original request once
+      await fetch(serverURL + '/auth/refresh', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      res = await fetch(serverURL + path, {
+        credentials: 'include',
+        ...init,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(init.headers || {})
+        }
+      });
+    }
+    return res;
+  };
+
   useEffect(() => {
     if (caseId) {
-      fetch(serverURL + `/cases/${caseId}/devices`)
+
+      apiFetch(`/cases/${caseId}/devices`)
         .then(res => res.json())
         .then(data => setDevices(data))
         .catch(err => console.error('Failed to fetch devices:', err));
@@ -33,9 +62,9 @@ const ManageCase = () => {
     try {
       setDeletingId(deviceId);
       // If your API uses a different route, adjust this path:      
-      const res = await fetch(serverURL + `/devices/${deviceId}`, {
-        method: 'DELETE',
-      });
+
+      const res = await apiFetch(`/devices/${deviceId}`, { method: 'DELETE' });
+
       if (!res.ok) throw new Error('Failed to delete device.');
       // Optimistic UI update
       setDevices(prev => prev.filter(d => d.id !== deviceId));
@@ -75,7 +104,7 @@ const ManageCase = () => {
         className="gray-button"
         onClick={async () => {
           try {
-            const res = await fetch(serverURL + `/cases/${caseId}/export`);
+            const res = await apiFetch(`/cases/${caseId}/export`);
             if (!res.ok) throw new Error('Failed to download ZIP');
 
             const blob = await res.blob();
@@ -156,9 +185,7 @@ const ManageCase = () => {
           if (!window.confirm("Are you sure you want to delete this case? This action cannot be undone.")) return;
 
           try {
-            const res = await fetch(serverURL + `/cases/${caseId}`, {
-              method: 'DELETE',
-            });
+            const res = await apiFetch(`/cases/${caseId}`, { method: 'DELETE' });
 
             if (!res.ok) {
               throw new Error("Failed to delete the case.");

@@ -62,23 +62,23 @@ function signRefreshToken(user) {
   return jwt.sign({ sub: user.id }, REFRESH_SECRET, { expiresIn: "7d" });
 }
 function setAuthCookies(res, accessToken, refreshToken) {
-  const isProd = process.env.NODE_ENV === "production";
-  // HttpOnly cookies (not accessible from JS)
+  const isHttps = true; // we’ll run dev over HTTPS
   res.cookie("access_token", accessToken, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: "strict",
+    secure: isHttps,        // REQUIRED when SameSite: 'none'
+    sameSite: "none",       // allow cross-site
     path: "/",
     maxAge: 1000 * 60 * 15
   });
   res.cookie("refresh_token", refreshToken, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: "strict",
+    secure: isHttps,
+    sameSite: "none",
     path: "/auth/refresh",
     maxAge: 1000 * 60 * 60 * 24 * 7
   });
 }
+
 
 
 
@@ -190,17 +190,7 @@ app.get('/users', async (req, res) => {
 });
 
 
-app.get('/cases', async (req, res) => {
-  try {
-    const cases = await prisma.case.findMany({
-      orderBy: { eventDate: 'desc' }, // Optional: sort by event date
-    });
-    res.json(cases);
-  } catch (err) {
-    console.error('Error fetching cases:', err);
-    res.status(500).json({ error: 'Failed to fetch cases' });
-  }
-});
+
 
 
 app.post('/users', async (req, res) => {
@@ -211,70 +201,13 @@ app.post('/users', async (req, res) => {
 
 
 
-app.get('/cases/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  try {
-    const found = await prisma.case.findUnique({ where: { id } });
-    if (!found) {
-      return res.status(404).json({ error: 'Case not found' });
-    }
-    res.json(found);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error retrieving case' });
-  }
-});
 
 
-app.post('/cases', async (req, res) => {
-  const { caseNumber, eventDate, eventTime, crimeType } = req.body;
-
-  try {
-    const newCase = await prisma.case.create({
-      data: {
-        caseNumber,
-        eventDate: new Date(eventDate),
-        eventTime,
-        crimeType
-      }
-    });
-
-    res.status(201).json(newCase);
-  } catch (err) {
-    console.error('Error saving case:', err);
-    if (err.code === 'P2002') {
-      res.status(400).json({ error: 'Case number already exists' });
-    } else {
-      console.log('BODY:', req.body);
-      console.log('FILES:', req.files);
-
-      res.status(500).json({ error: 'Failed to create case' });
-    }
-  }
-});
 
 
-app.put('/cases/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const { caseNumber, eventDate, eventTime, crimeType } = req.body;
 
-  try {
-    const updated = await prisma.case.update({
-      where: { id },
-      data: {
-        caseNumber,
-        eventDate: new Date(eventDate),
-        eventTime,
-        crimeType,
-      },
-    });
 
-    res.json(updated);
-  } catch (err) {
-    console.error('Error updating case:', err);
-    res.status(500).json({ error: 'Failed to update case' });
-  }
-});
+
 
 
 app.post('/devices', async (req, res) => {
@@ -298,22 +231,19 @@ app.post('/devices', async (req, res) => {
 });
 
 
-app.get('/cases/:id/devices', async (req, res) => {
-  const id = parseInt(req.params.id);
-  console.log("Fetching devices for case ID:", id);
-
-  try {
-    const devices = await prisma.device.findMany({
-      where: { caseId: parseInt(req.params.id) },
-      include: { images: true }
-    });
-    console.log("Found devices:", devices);
-    res.json(devices);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch devices' });
-  }
+// Example: list devices for a case, ensuring that case belongs to the user
+app.get("/cases/:id/devices", requireAuth, async (req, res) => {
+  const caseId = Number(req.params.id);
+  const devices = await prisma.device.findMany({
+    where: {
+      caseId,
+      case: { ownerId: req.user.sub }, // <- ties back to owner
+    },
+    orderBy: { createdAt: "desc" }
+  });
+  res.json(devices);
 });
+
 
 
 
@@ -382,17 +312,7 @@ app.get('/cases/:id/export', async (req, res) => {
 
 
 
-app.delete('/cases/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
 
-  try {
-    await prisma.case.delete({ where: { id } });
-    res.status(200).json({ message: 'Case and all related data deleted via cascade.' });
-  } catch (err) {
-    console.error('Error deleting case:', err);
-    res.status(500).json({ error: 'Failed to delete case.' });
-  }
-});
 
 async function deleteDeviceById(req, res) {
   const id = Number(req.params.id || req.params.deviceId);
@@ -431,13 +351,120 @@ async function deleteDeviceById(req, res) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+// CREATE a case — always stamped with the logged-in user as owner
+app.post("/cases", requireAuth, async (req, res) => {
+  const { caseNumber, eventDate, eventTime, crimeType } = req.body;
+  try {
+    const created = await prisma.case.create({
+      data: {
+        caseNumber,
+        eventDate: new Date(eventDate),
+        eventTime,
+        crimeType,
+        ownerId: req.user.sub, // <- ownership enforced here
+      },
+      select: { id: true, caseNumber: true }
+    });
+    res.status(201).json(created);
+  } catch (e) {
+    // handle uniqueness errors (e.g., unique per owner)
+    if (e.code === "P2002") {
+      return res.status(409).json({ error: "Case number already exists" });
+    }
+    console.error("[POST /cases]", e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// LIST cases — only the owner’s cases
+app.get("/cases", requireAuth, async (req, res) => {
+  try {
+    const cases = await prisma.case.findMany({
+      where: { ownerId: req.user.sub },
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(cases);
+  } catch (e) {
+    console.error("[GET /cases]", e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// READ one — must belong to owner
+app.get("/cases/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+  const c = await prisma.case.findFirst({
+    where: { id, ownerId: req.user.sub },
+  });
+  if (!c) return res.status(404).json({ error: "Not found" });
+  res.json(c);
+});
+
+// UPDATE one — constrain by owner in the WHERE
+app.put("/cases/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+  const { caseNumber, eventDate, eventTime, crimeType } = req.body;
+  try {
+    const updated = await prisma.case.updateMany({
+      where: { id, ownerId: req.user.sub },
+      data: {
+        ...(caseNumber !== undefined ? { caseNumber } : {}),
+        ...(eventDate !== undefined ? { eventDate: new Date(eventDate) } : {}),
+        ...(eventTime !== undefined ? { eventTime } : {}),
+        ...(crimeType !== undefined ? { crimeType } : {}),
+      },
+    });
+    if (updated.count === 0) return res.status(404).json({ error: "Not found" });
+    res.json({ ok: true });
+  } catch (e) {
+    if (e.code === "P2002") {
+      return res.status(409).json({ error: "Case number already exists" });
+    }
+    console.error("[PUT /cases/:id]", e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// DELETE one — constrain by owner in the WHERE
+app.delete("/cases/:id", requireAuth, async (req, res) => {
+  const id = Number(req.params.id);
+  const deleted = await prisma.case.deleteMany({
+    where: { id, ownerId: req.user.sub },
+  });
+  if (deleted.count === 0) return res.status(404).json({ error: "Not found" });
+  res.json({ ok: true });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//dave, check these
 // Flat route (simple)
 app.delete('/devices/:id', deleteDeviceById);
 
 // Optional nested route (if your client calls this shape)
 app.delete('/cases/:caseId/devices/:deviceId', deleteDeviceById);
-
-
 
 
 app.listen(4000, () => console.log('API running on http://localhost:4000'));

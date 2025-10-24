@@ -32,13 +32,25 @@ function NewCase() {
     };
 
     try {
-      const res = await fetch(serverURL + `/cases`, {
+      let res = await fetch(serverURL + `/cases`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(caseData)
       });
+
+      // Optional: if token expired, refresh once then retry
+      if (res.status === 401) {
+        await fetch(serverURL + `/auth/refresh`, { method: 'POST', credentials: 'include' });
+        res = await fetch(serverURL + `/cases`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(caseData)
+        });
+      }
 
       if (!res.ok) {
         const err = await res.json();
