@@ -2,11 +2,16 @@ const archiver = require('archiver');
 const fs = require('fs');
 
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const cookieParser = require("cookie-parser");
+//const { PrismaClient } = require('@prisma/client');
+const { prisma } = require("./prisma");
+
 const cors = require('cors');
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const app = express();
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 const multer = require('multer');
 const path = require('path');
@@ -26,8 +31,124 @@ const upload = multer({ storage }); // ← use the configured storage
 
 
 
-app.use(cors());
+//app.use(cors());
+
+const allowedOrigins = ["http://localhost:3000", "http://localhost:4000", "https://appdemo.gamificationsoftware.org/"];
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin)) cb(null, origin);
+    else cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
+app.use(cookieParser());
+
+
+
+
+// In real life, use a DB. Example user:
+//const USERS = [{ id: "u1", email: "a@example.com", passwordHash: bcrypt.hashSync("pass1234", 10), role: "user" }];
+
+const ACCESS_SECRET = process.env.ACCESS_SECRET || "dev_access_secret";
+const REFRESH_SECRET = process.env.REFRESH_SECRET || "dev_refresh_secret";
+
+// Helpers
+function signAccessToken(user) {
+  return jwt.sign({ sub: user.id, email: user.email, role: user.role }, ACCESS_SECRET, { expiresIn: "15m" });
+}
+function signRefreshToken(user) {
+  return jwt.sign({ sub: user.id }, REFRESH_SECRET, { expiresIn: "7d" });
+}
+function setAuthCookies(res, accessToken, refreshToken) {
+  const isProd = process.env.NODE_ENV === "production";
+  // HttpOnly cookies (not accessible from JS)
+  res.cookie("access_token", accessToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "strict",
+    path: "/",
+    maxAge: 1000 * 60 * 15
+  });
+  res.cookie("refresh_token", refreshToken, {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: "strict",
+    path: "/auth/refresh",
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  });
+}
+
+
+
+app.post("/auth/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // Look up user in your Prisma User table
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !user.passwordHash) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) return res.status(401).json({ error: "Invalid credentials" });
+
+    const access = signAccessToken(user);
+    const refresh = signRefreshToken(user);
+    setAuthCookies(res, access, refresh);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("[/auth/login]", e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+app.post("/auth/refresh", (req, res) => {
+  const token = req.cookies?.refresh_token;
+  if (!token) return res.status(401).json({ error: "No refresh token" });
+  try {
+    const payload = jwt.verify(token, REFRESH_SECRET);
+    const user = USERS.find(u => u.id === payload.sub);
+    if (!user) return res.status(401).json({ error: "Invalid" });
+
+    // Rotation (optional: also re-issue a new refresh token)
+    const newAccess = signAccessToken(user);
+    const newRefresh = signRefreshToken(user);
+    setAuthCookies(res, newAccess, newRefresh);
+    res.json({ ok: true });
+  } catch {
+    res.status(401).json({ error: "Invalid refresh token" });
+  }
+});
+
+function requireAuth(req, res, next) {
+  const token = req.cookies?.access_token;
+  if (!token) return res.status(401).json({ error: "Missing access token" });
+  try {
+    req.user = jwt.verify(token, ACCESS_SECRET);
+    next();
+  } catch {
+    return res.status(401).json({ error: "Expired or invalid token" });
+  }
+}
+
+app.get("/me", requireAuth, (req, res) => {
+  res.json({ id: req.user.sub, email: req.user.email, role: req.user.role });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // POST /devices with image
 //const upload = multer({ dest: 'uploads/' });

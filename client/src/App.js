@@ -1,6 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { AuthProvider } from './auth';
+import ProtectedRoute from './ProtectedRoute';
+import LoginPage from './LoginPage';
+
 import EditCase from './EditCase';
 import NewCase from './NewCase';
 import ManageCase from './ManageCase';
@@ -33,9 +37,15 @@ function Home() {
 	//console.log("the serverURL is " + serverURL);
 
 	useEffect(() => {
-		fetch(serverURL + `/cases`)
-			.then(res => res.json())
-			.then(data => setCases(data))
+		fetch(serverURL + `/cases`, { credentials: "include" })
+			.then(async (res) => {
+				if (res.status === 401) {
+					navigate("/login", { replace: true, state: { from: { pathname: "/" } } });
+					return [];
+				}
+				return res.json();
+			})
+			.then((data) => setCases(Array.isArray(data) ? data : []))
 			.catch(err => console.error('Error loading cases:', err));
 	}, []);
 
@@ -88,20 +98,44 @@ function Home() {
 
 function App() {
 	return (
-		<>
-			<Navbar />
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/editcase" element={<EditCase />} />
-				<Route path="/newcase" element={<NewCase />} />
-				<Route path="/managecase" element={<ManageCase />} />
-				<Route path="/collectevidence" element={<CollectEvidence />} />
-				<Route path="/removablemediainstructions" element={<RemovableMediaInstructions />} />
-				<Route path="/smartphoneInstructions" element={<SmartphoneInstructions />} />
-				<Route path="/desktopLaptopConsoleInstructions" element={<DesktopLaptopConsoleInstructions />} />				
-				<Route path="/otherInstructions" element={<OtherInstructions />} />				
-			</Routes>
-		</>
+		<AuthProvider>
+			<>
+				<Navbar />
+				<Routes>
+					{/* Public route */}
+					<Route path="/login" element={<LoginPage />} />
+
+					{/* Protected routes */}
+					<Route path="/" element={
+						<ProtectedRoute><Home /></ProtectedRoute>
+					} />
+					<Route path="/editcase" element={
+						<ProtectedRoute><EditCase /></ProtectedRoute>
+					} />
+					<Route path="/newcase" element={
+						<ProtectedRoute><NewCase /></ProtectedRoute>
+					} />
+					<Route path="/managecase" element={
+						<ProtectedRoute><ManageCase /></ProtectedRoute>
+					} />
+					<Route path="/collectevidence" element={
+						<ProtectedRoute><CollectEvidence /></ProtectedRoute>
+					} />
+					<Route path="/removablemediainstructions" element={
+						<ProtectedRoute><RemovableMediaInstructions /></ProtectedRoute>
+					} />
+					<Route path="/smartphoneInstructions" element={
+						<ProtectedRoute><SmartphoneInstructions /></ProtectedRoute>
+					} />
+					<Route path="/desktopLaptopConsoleInstructions" element={
+						<ProtectedRoute><DesktopLaptopConsoleInstructions /></ProtectedRoute>
+					} />
+					<Route path="/otherInstructions" element={
+						<ProtectedRoute><OtherInstructions /></ProtectedRoute>
+					} />
+				</Routes>
+			</>
+		</AuthProvider>
 	);
 }
 
