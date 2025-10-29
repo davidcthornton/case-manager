@@ -14,8 +14,8 @@ const ManageCase = () => {
     //serverURL = process.env.REACT_APP_SERVER_URL;
     serverURL = '/api';
   }
-  //console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
-  //console.log("serverURL is " + serverURL);
+  console.log("API base URL:", process.env.REACT_APP_SERVER_URL);
+  console.log("serverURL is " + serverURL);
 
   // Helper: fetch with credentials + one-time refresh-on-401
   const apiFetch = async (path, init = {}) => {
@@ -79,6 +79,7 @@ const ManageCase = () => {
   if (!caseId) return <p>No case selected.</p>;
 
   return (
+
     <div className="Page">
       <h1>Manage Case</h1>
       <div style={{ textAlign: 'center', marginBottom: '30px' }}>
@@ -130,10 +131,13 @@ const ManageCase = () => {
       <h2>Collected Devices</h2>
       {devices.length === 0 ? (
         <p>No devices collected for this case.</p>
+
       ) : (
+
         <ul>
 
           {devices.map((d) => (
+
             <li key={d.id}>
               {d.name} ({d.type}) – Collected on {new Date(d.collectedAt).toLocaleString()}
 
@@ -153,21 +157,26 @@ const ManageCase = () => {
               >
                 🗑️
               </button>
-
+            
               {Array.isArray(d.images) && d.images.length > 0 && (
                 <div>
-                  {d.images.map((img, i) => (
-                    <img
-                      key={i}
-                      src={`${serverURL}/${(img.path || '')
-                        .replace(/^[\\/]+/, '')   // trim any leading / or \
-                        .replace(/\\/g, '/')      // convert all backslashes to forward slashes
-                        }`}
+                  {d.images.map((img, i) => {
+                    // compute and log the actual path for debugging
+                    const imgPath = `${serverURL}/${(img.path || '')
+                      .replace(/^[\\/]+/, '')   // trim leading / or \
+                      .replace(/\\/g, '/')      // convert backslashes to forward slashes
+                      }`;
+                    console.log('Rendering image:', imgPath);
+                    return (
+                      <img
+                        key={i}
+                        src={imgPath}
+                        alt="evidence"
+                        style={{ maxWidth: '200px', marginRight: '10px' }}
+                      />
+                    );
+                  })}
 
-                      alt="evidence"
-                      style={{ maxWidth: '200px', marginRight: '10px' }}
-                    />
-                  ))}
                 </div>
               )}
 

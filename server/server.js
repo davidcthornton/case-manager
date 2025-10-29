@@ -182,7 +182,10 @@ app.post('/devices', upload.array('images'), async (req, res) => {
 
 
 // serve static uploaded images
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use("/uploads", requireAuth, express.static(path.join(__dirname, "uploads")));
+
 
 app.get('/users', async (req, res) => {
   const users = await prisma.user.findMany();
@@ -231,19 +234,16 @@ app.post('/devices', async (req, res) => {
 });
 
 
-// Example: list devices for a case, ensuring that case belongs to the user
-app.get("/cases/:id/devices", requireAuth, async (req, res) => {
+// server route
+app.get('/cases/:id/devices', requireAuth, async (req, res) => {
   const caseId = Number(req.params.id);
-  const devices = await prisma.device.findMany({
-    where: {
-      caseId,
-      case: { ownerId: req.user.sub }, // <- ties back to owner
-    },
-    orderBy: { createdAt: "desc" }
+  const rows = await prisma.device.findMany({
+    where: { caseId, case: { ownerId: req.user.sub } }, // your ownership guard
+    include: { images: true },                           // <-- critical
+    orderBy: { createdAt: 'desc' }
   });
-  res.json(devices);
+  res.json(rows);
 });
-
 
 
 
