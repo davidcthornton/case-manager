@@ -5,12 +5,14 @@ let API_BASE_URL;
 if (!process.env.REACT_APP_SERVER_URL) {
     API_BASE_URL = 'http://localhost:4000';
 } else {
-    API_BASE_URL = process.env.REACT_APP_SERVER_URL;     
+    //API_BASE_URL = process.env.REACT_APP_SERVER_URL;     
+    API_BASE_URL = 'https://appdemo.gamificationsoftware.org';  //dave, fix this later
 }
-//const API_BASE_URL = import.meta?.env?.VITE_API_URL || "http://localhost:4000";
 
+//const API_BASE_URL = import.meta?.env?.VITE_API_URL || "http://localhost:4000";
+console.log("dave, baseURL is " + API_BASE_URL);
 export const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: API_BASE_URL,    
     withCredentials: true // send/receive cookies
 });
 
