@@ -45,7 +45,7 @@ app.use((req, _res, next) => {
 });
 // -------------------------------
 
-const allowedOrigins = ["http://localhost:3000", "http://localhost:4000", "https://appdemo.gamificationsoftware.org/"];
+const allowedOrigins = ["http://localhost:3000", "http://localhost:4000", "https://appdemo.gamificationsoftware.org"];
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin || allowedOrigins.includes(origin)) cb(null, origin);
