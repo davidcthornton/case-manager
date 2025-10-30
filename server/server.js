@@ -33,6 +33,18 @@ const upload = multer({ storage }); // ← use the configured storage
 
 //app.use(cors());
 
+// --- debug incoming Origins ---
+app.use((req, _res, next) => {
+  if (req.headers.origin) {
+    console.log('[CORS] Incoming Origin:', req.headers.origin);
+  } else {
+    // requests from curl/pm2 health checks/etc have no Origin
+    // that's normal—don’t block those
+  }
+  next();
+});
+// -------------------------------
+
 const allowedOrigins = ["http://localhost:3000", "http://localhost:4000", "https://appdemo.gamificationsoftware.org/"];
 app.use(cors({
   origin: (origin, cb) => {
